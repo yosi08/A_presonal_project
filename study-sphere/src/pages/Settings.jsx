@@ -1,30 +1,70 @@
-import { useState } from 'react'
-import { User, Bell, Palette, Shield, Save, Check, Globe } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { User, Bell, Palette, Shield, Save, Check, Globe, Camera } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
 export default function Settings() {
-  const { t, user, setUser, language, setLanguage } = useApp()
+  const { t, user, setUser, language, setLanguage, settings, setSettings } = useApp()
   const [activeTab, setActiveTab] = useState('profile')
   const [saved, setSaved] = useState(false)
   const [profile, setProfile] = useState({
     name: user.name,
     email: user.email,
-    bio: '',
+    bio: user.bio || '',
   })
-  const [notifications, setNotifications] = useState({
-    emailReminders: true,
-    studyReminders: true,
-    weeklyReport: false,
-  })
-  const [appearance, setAppearance] = useState({
-    theme: 'light',
-    accentColor: 'indigo',
-  })
+  const fileInputRef = useRef(null)
 
   const handleSave = () => {
-    setUser({ ...user, name: profile.name, email: profile.email })
+    // 프로필 저장
+    setUser({
+      ...user,
+      name: profile.name,
+      bio: profile.bio,
+    })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert(t('fileTooLarge'))
+        return
+      }
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setUser({
+          ...user,
+          avatar: reader.result,
+          avatarType: 'image',
+        })
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleThemeChange = (theme) => {
+    setSettings({
+      ...settings,
+      theme,
+    })
+  }
+
+  const handleAccentColorChange = (accentColor) => {
+    setSettings({
+      ...settings,
+      accentColor,
+    })
+  }
+
+  const handleNotificationChange = (key) => {
+    setSettings({
+      ...settings,
+      notifications: {
+        ...settings.notifications,
+        [key]: !settings.notifications[key],
+      },
+    })
   }
 
   const tabs = [
@@ -96,11 +136,37 @@ export default function Settings() {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                      {profile.name.charAt(0)}
+                    <div className="relative">
+                      {user.avatarType === 'image' && user.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt="Avatar"
+                          className="w-20 h-20 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                          {profile.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="absolute bottom-0 right-0 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white hover:bg-indigo-700 transition-colors"
+                      >
+                        <Camera className="w-4 h-4" />
+                      </button>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="hidden"
+                      />
                     </div>
                     <div>
-                      <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+                      >
                         {t('changeAvatar')}
                       </button>
                       <p className="text-xs text-gray-500 mt-1">JPG, PNG. Max 2MB</p>
@@ -159,19 +225,14 @@ export default function Settings() {
                         <p className="text-sm text-gray-500">{t('emailRemindersDesc')}</p>
                       </div>
                       <button
-                        onClick={() =>
-                          setNotifications({
-                            ...notifications,
-                            emailReminders: !notifications.emailReminders,
-                          })
-                        }
+                        onClick={() => handleNotificationChange('emailReminders')}
                         className={`relative w-12 h-6 rounded-full transition-colors ${
-                          notifications.emailReminders ? 'bg-indigo-600' : 'bg-gray-300'
+                          settings.notifications.emailReminders ? 'bg-indigo-600' : 'bg-gray-300'
                         }`}
                       >
                         <span
                           className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                            notifications.emailReminders ? 'left-7' : 'left-1'
+                            settings.notifications.emailReminders ? 'left-7' : 'left-1'
                           }`}
                         />
                       </button>
@@ -183,19 +244,14 @@ export default function Settings() {
                         <p className="text-sm text-gray-500">{t('studyRemindersDesc')}</p>
                       </div>
                       <button
-                        onClick={() =>
-                          setNotifications({
-                            ...notifications,
-                            studyReminders: !notifications.studyReminders,
-                          })
-                        }
+                        onClick={() => handleNotificationChange('studyReminders')}
                         className={`relative w-12 h-6 rounded-full transition-colors ${
-                          notifications.studyReminders ? 'bg-indigo-600' : 'bg-gray-300'
+                          settings.notifications.studyReminders ? 'bg-indigo-600' : 'bg-gray-300'
                         }`}
                       >
                         <span
                           className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                            notifications.studyReminders ? 'left-7' : 'left-1'
+                            settings.notifications.studyReminders ? 'left-7' : 'left-1'
                           }`}
                         />
                       </button>
@@ -207,19 +263,14 @@ export default function Settings() {
                         <p className="text-sm text-gray-500">{t('weeklyReportDesc')}</p>
                       </div>
                       <button
-                        onClick={() =>
-                          setNotifications({
-                            ...notifications,
-                            weeklyReport: !notifications.weeklyReport,
-                          })
-                        }
+                        onClick={() => handleNotificationChange('weeklyReport')}
                         className={`relative w-12 h-6 rounded-full transition-colors ${
-                          notifications.weeklyReport ? 'bg-indigo-600' : 'bg-gray-300'
+                          settings.notifications.weeklyReport ? 'bg-indigo-600' : 'bg-gray-300'
                         }`}
                       >
                         <span
                           className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                            notifications.weeklyReport ? 'left-7' : 'left-1'
+                            settings.notifications.weeklyReport ? 'left-7' : 'left-1'
                           }`}
                         />
                       </button>
@@ -240,9 +291,9 @@ export default function Settings() {
                     <h3 className="font-medium text-gray-900 mb-3">{t('theme')}</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <button
-                        onClick={() => setAppearance({ ...appearance, theme: 'light' })}
+                        onClick={() => handleThemeChange('light')}
                         className={`p-4 rounded-lg border-2 transition-colors ${
-                          appearance.theme === 'light'
+                          settings.theme === 'light'
                             ? 'border-indigo-600 bg-indigo-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
@@ -251,9 +302,9 @@ export default function Settings() {
                         <span className="font-medium text-gray-900">{t('light')}</span>
                       </button>
                       <button
-                        onClick={() => setAppearance({ ...appearance, theme: 'dark' })}
+                        onClick={() => handleThemeChange('dark')}
                         className={`p-4 rounded-lg border-2 transition-colors ${
-                          appearance.theme === 'dark'
+                          settings.theme === 'dark'
                             ? 'border-indigo-600 bg-indigo-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
@@ -270,12 +321,12 @@ export default function Settings() {
                       {accentColors.map((color) => (
                         <button
                           key={color.name}
-                          onClick={() => setAppearance({ ...appearance, accentColor: color.name })}
+                          onClick={() => handleAccentColorChange(color.name)}
                           className={`w-10 h-10 rounded-full ${color.color} flex items-center justify-center transition-transform ${
-                            appearance.accentColor === color.name ? 'scale-110 ring-2 ring-offset-2 ring-gray-400' : ''
+                            settings.accentColor === color.name ? 'scale-110 ring-2 ring-offset-2 ring-gray-400' : ''
                           }`}
                         >
-                          {appearance.accentColor === color.name && (
+                          {settings.accentColor === color.name && (
                             <Check className="w-5 h-5 text-white" />
                           )}
                         </button>
@@ -360,29 +411,31 @@ export default function Settings() {
                 </div>
               )}
 
-              {/* Save Button */}
-              <div className="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-                <button
-                  onClick={handleSave}
-                  className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${
-                    saved
-                      ? 'bg-green-600 text-white'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  }`}
-                >
-                  {saved ? (
-                    <>
-                      <Check className="w-5 h-5" />
-                      {t('saved')}
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-5 h-5" />
-                      {t('save')}
-                    </>
-                  )}
-                </button>
-              </div>
+              {/* Save Button - Only show for profile tab */}
+              {activeTab === 'profile' && (
+                <div className="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                  <button
+                    onClick={handleSave}
+                    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium transition-colors ${
+                      saved
+                        ? 'bg-green-600 text-white'
+                        : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    }`}
+                  >
+                    {saved ? (
+                      <>
+                        <Check className="w-5 h-5" />
+                        {t('saved')}
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-5 h-5" />
+                        {t('save')}
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

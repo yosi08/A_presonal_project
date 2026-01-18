@@ -19,9 +19,9 @@ export default function MobileHeader() {
 
   const handleLogout = () => {
     logout()
-    navigate('/')
     setShowLogoutConfirm(false)
     setIsOpen(false)
+    navigate('/login')
   }
 
   return (

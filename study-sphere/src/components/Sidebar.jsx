@@ -18,8 +18,8 @@ export default function Sidebar() {
 
   const handleLogout = () => {
     logout()
-    navigate('/')
     setShowLogoutConfirm(false)
+    navigate('/login')
   }
 
   return (
