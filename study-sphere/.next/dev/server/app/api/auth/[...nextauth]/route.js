@@ -1,0 +1,10 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/api/auth/[...nextauth]/route.js")
+R.c("server/chunks/a869a_next_7e2737a5._.js")
+R.c("server/chunks/a869a_next-auth_cac98500._.js")
+R.c("server/chunks/a869a_openid-client_3cbb87bc._.js")
+R.c("server/chunks/a869a_jose_dist_node_cjs_66c75a00._.js")
+R.c("server/chunks/a869a_50fa70af._.js")
+R.c("server/chunks/[root-of-the-server]__4cfbe135._.js")
+R.c("server/chunks/5f7c2__next-internal_server_app_api_auth_[___nextauth]_route_actions_7590b484.js")
+R.m("[project]/study-sphere/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/study-sphere/src/app/api/auth/[...nextauth]/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/study-sphere/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/study-sphere/src/app/api/auth/[...nextauth]/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

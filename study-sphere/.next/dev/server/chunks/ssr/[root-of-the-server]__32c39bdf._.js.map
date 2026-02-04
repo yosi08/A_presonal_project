@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 68, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/stres/A_presonal_project/study-sphere/src/app/page.jsx"],"sourcesContent":["import { redirect } from 'next/navigation'\nimport { getServerSession } from 'next-auth'\n\nexport default async function RootPage() {\n  const session = await getServerSession()\n\n  if (session) {\n    redirect('/home')\n  } else {\n    redirect('/login')\n  }\n}\n"],"names":[],"mappings":";;;;AAAA;AAAA;AACA;;;AAEe,eAAe;IAC5B,MAAM,UAAU,MAAM,IAAA,4KAAgB;IAEtC,IAAI,SAAS;QACX,IAAA,oNAAQ,EAAC;IACX,OAAO;QACL,IAAA,oNAAQ,EAAC;IACX;AACF"}}]
+}
