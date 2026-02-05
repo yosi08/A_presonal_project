@@ -1,10 +1,22 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import en from '@/locales/en/translation.json'
 import ko from '@/locales/ko/translation.json'
 
-const AppContext = createContext()
+interface AppContextType {
+  language: string
+  setLanguage: (lang: string) => void
+  t: (key: string) => string
+  sessions: any[]
+  setSessions: (sessions: any[]) => void
+  notes: any[]
+  setNotes: (notes: any[]) => void
+  settings: any
+  setSettings: (settings: any) => void
+}
+
+const AppContext = createContext<AppContextType | null>(null)
 
 const translations = { en, ko }
 
@@ -37,7 +49,7 @@ const defaultSettings = {
   },
 }
 
-export function AppProvider({ children }) {
+export function AppProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState('ko')
   const [sessions, setSessions] = useState(defaultSessions)
   const [notes, setNotes] = useState(defaultNotes)

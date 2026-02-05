@@ -1,8 +1,0 @@
-{
-  "/(protected)/calendar/page": "app/(protected)/calendar/page.js",
-  "/(protected)/home/page": "app/(protected)/home/page.js",
-  "/(protected)/notes/page": "app/(protected)/notes/page.js",
-  "/(protected)/timer/page": "app/(protected)/timer/page.js",
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/page": "app/page.js"
-}
