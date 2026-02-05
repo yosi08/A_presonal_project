@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Search, X, Edit3, Trash2 } from 'lucide-react'
+import { Plus, Search, X, Edit3, Trash2, BookOpen } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 
 const SUBJECTS = [
@@ -24,13 +24,14 @@ export default function Notes() {
   const [newNote, setNewNote] = useState({
     title: '',
     subject: 'Other',
-    content: '',
+    cues: '',
+    notes: '',
+    summary: '',
   })
 
   const filteredNotes = notes.filter((note) => {
-    const matchesSearch =
-      note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      note.content.toLowerCase().includes(searchTerm.toLowerCase())
+    const searchContent = `${note.title} ${note.cues || ''} ${note.notes || ''} ${note.summary || ''} ${note.content || ''}`
+    const matchesSearch = searchContent.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesSubject = selectedSubject === 'All' || note.subject === selectedSubject
     return matchesSearch && matchesSubject
   })
@@ -67,7 +68,7 @@ export default function Notes() {
     }
 
     setNotes([note, ...notes])
-    setNewNote({ title: '', subject: 'Other', content: '' })
+    setNewNote({ title: '', subject: 'Other', cues: '', notes: '', summary: '' })
     setIsModalOpen(false)
   }
 
@@ -92,7 +93,14 @@ export default function Notes() {
   }
 
   const openEditModal = (note) => {
-    setEditingNote({ ...note })
+    // 기존 content 필드가 있는 노트를 코넬 형식으로 변환
+    const cornellNote = {
+      ...note,
+      cues: note.cues || '',
+      notes: note.notes || note.content || '',
+      summary: note.summary || '',
+    }
+    setEditingNote(cornellNote)
     setIsViewModalOpen(false)
     setIsModalOpen(true)
   }
@@ -100,6 +108,13 @@ export default function Notes() {
   const openViewModal = (note) => {
     setSelectedNote(note)
     setIsViewModalOpen(true)
+  }
+
+  // 노트 미리보기 텍스트 생성
+  const getPreviewText = (note) => {
+    if (note.notes) return note.notes
+    if (note.content) return note.content
+    return ''
   }
 
   return (
@@ -110,12 +125,12 @@ export default function Notes() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold">{t('notes')}</h1>
-              <p className="text-indigo-100 mt-1">{t('organizeNotes')}</p>
+              <p className="text-indigo-100 mt-1">{t('cornellNoteDescription') || '코넬 노트 방식으로 효율적인 학습을 하세요'}</p>
             </div>
             <button
               onClick={() => {
                 setEditingNote(null)
-                setNewNote({ title: '', subject: 'Other', content: '' })
+                setNewNote({ title: '', subject: 'Other', cues: '', notes: '', summary: '' })
                 setIsModalOpen(true)
               }}
               className="inline-flex items-center gap-2 bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors font-medium shadow"
@@ -181,7 +196,7 @@ export default function Notes() {
         {filteredNotes.length === 0 ? (
           <div className="bg-white rounded-xl shadow-lg p-12 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-gray-400" />
+              <BookOpen className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">{t('noNotesFound')}</h3>
             <p className="text-gray-500 mb-4">
@@ -192,7 +207,7 @@ export default function Notes() {
             <button
               onClick={() => {
                 setEditingNote(null)
-                setNewNote({ title: '', subject: 'Other', content: '' })
+                setNewNote({ title: '', subject: 'Other', cues: '', notes: '', summary: '' })
                 setIsModalOpen(true)
               }}
               className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
@@ -207,33 +222,55 @@ export default function Notes() {
               <div
                 key={note.id}
                 onClick={() => openViewModal(note)}
-                className="bg-white rounded-xl shadow-lg p-5 cursor-pointer hover:shadow-xl transition-shadow border border-gray-100 hover:border-indigo-200"
+                className="bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow border border-gray-100 hover:border-indigo-200"
               >
-                <div
-                  className="w-full h-1.5 rounded-full mb-4"
-                  style={{ backgroundColor: note.color }}
-                />
-                <h3 className="font-semibold text-gray-900 text-lg mb-2 truncate">{note.title}</h3>
-                <p className="text-sm text-gray-500 mb-3">
-                  {getSubjectTranslation(note.subject)} • {note.date}
-                </p>
-                <p className="text-gray-600 text-sm line-clamp-3 whitespace-pre-wrap">
-                  {note.content}
-                </p>
+                {/* 코넬 노트 미니 프리뷰 */}
+                <div className="p-4">
+                  <div
+                    className="w-full h-1.5 rounded-full mb-3"
+                    style={{ backgroundColor: note.color }}
+                  />
+                  <h3 className="font-semibold text-gray-900 text-lg mb-2 truncate">{note.title}</h3>
+                  <p className="text-sm text-gray-500 mb-3">
+                    {getSubjectTranslation(note.subject)} • {note.date}
+                  </p>
+
+                  {/* 코넬 노트 구조 미리보기 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="flex min-h-[80px]">
+                      {/* Cue 영역 */}
+                      <div className="w-1/3 bg-indigo-50 p-2 border-r border-gray-200">
+                        <p className="text-xs text-indigo-600 font-medium mb-1">Cue</p>
+                        <p className="text-xs text-gray-600 line-clamp-3">{note.cues || '-'}</p>
+                      </div>
+                      {/* Notes 영역 */}
+                      <div className="w-2/3 p-2">
+                        <p className="text-xs text-gray-500 font-medium mb-1">Notes</p>
+                        <p className="text-xs text-gray-600 line-clamp-3">{getPreviewText(note) || '-'}</p>
+                      </div>
+                    </div>
+                    {/* Summary 영역 */}
+                    <div className="bg-gray-50 p-2 border-t border-gray-200">
+                      <p className="text-xs text-gray-500 font-medium mb-1">Summary</p>
+                      <p className="text-xs text-gray-600 line-clamp-1">{note.summary || '-'}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Add/Edit Note Modal */}
+      {/* Add/Edit Note Modal - Cornell Format */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold">
-                {editingNote ? t('editNote') : t('createNote')}
+                {editingNote ? t('editNote') : t('createNote')} - {t('cornellNote') || '코넬 노트'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -243,66 +280,115 @@ export default function Notes() {
               </button>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('title')}</label>
-                <input
-                  type="text"
-                  value={editingNote ? editingNote.title : newNote.title}
-                  onChange={(e) =>
-                    editingNote
-                      ? setEditingNote({ ...editingNote, title: e.target.value })
-                      : setNewNote({ ...newNote, title: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="Note title"
-                />
+            <div className="p-6">
+              {/* Title and Subject */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('title')}</label>
+                  <input
+                    type="text"
+                    value={editingNote ? editingNote.title : newNote.title}
+                    onChange={(e) =>
+                      editingNote
+                        ? setEditingNote({ ...editingNote, title: e.target.value })
+                        : setNewNote({ ...newNote, title: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    placeholder={t('noteTitlePlaceholder') || '노트 제목을 입력하세요'}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('subject')}</label>
+                  <select
+                    value={editingNote ? editingNote.subject : newNote.subject}
+                    onChange={(e) =>
+                      editingNote
+                        ? setEditingNote({ ...editingNote, subject: e.target.value })
+                        : setNewNote({ ...newNote, subject: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  >
+                    {SUBJECTS.map((subject) => (
+                      <option key={subject.name} value={subject.name}>
+                        {getSubjectTranslation(subject.name)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('subject')}</label>
-                <select
-                  value={editingNote ? editingNote.subject : newNote.subject}
-                  onChange={(e) =>
-                    editingNote
-                      ? setEditingNote({ ...editingNote, subject: e.target.value })
-                      : setNewNote({ ...newNote, subject: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  {SUBJECTS.map((subject) => (
-                    <option key={subject.name} value={subject.name}>
-                      {getSubjectTranslation(subject.name)}
-                    </option>
-                  ))}
-                </select>
+              {/* Cornell Note Structure */}
+              <div className="border-2 border-gray-300 rounded-xl overflow-hidden">
+                {/* Main Content Area */}
+                <div className="flex flex-col sm:flex-row min-h-[300px]">
+                  {/* Cue Column */}
+                  <div className="sm:w-1/3 bg-indigo-50 border-b sm:border-b-0 sm:border-r border-gray-300">
+                    <div className="p-3 border-b border-gray-300 bg-indigo-100">
+                      <h4 className="font-semibold text-indigo-800 text-sm">{t('cueColumn') || '단서/질문'}</h4>
+                      <p className="text-xs text-indigo-600 mt-0.5">{t('cueDescription') || '키워드, 질문, 핵심 개념'}</p>
+                    </div>
+                    <textarea
+                      value={editingNote ? editingNote.cues : newNote.cues}
+                      onChange={(e) =>
+                        editingNote
+                          ? setEditingNote({ ...editingNote, cues: e.target.value })
+                          : setNewNote({ ...newNote, cues: e.target.value })
+                      }
+                      className="w-full h-[200px] sm:h-[calc(100%-60px)] p-3 bg-transparent resize-none focus:outline-none text-sm"
+                      placeholder={t('cuePlaceholder') || '• 주요 키워드\n• 핵심 질문\n• 중요 개념'}
+                    />
+                  </div>
+
+                  {/* Notes Column */}
+                  <div className="sm:w-2/3">
+                    <div className="p-3 border-b border-gray-300 bg-gray-100">
+                      <h4 className="font-semibold text-gray-800 text-sm">{t('notesColumn') || '노트'}</h4>
+                      <p className="text-xs text-gray-600 mt-0.5">{t('notesDescription') || '수업 내용, 상세 설명, 예시'}</p>
+                    </div>
+                    <textarea
+                      value={editingNote ? editingNote.notes : newNote.notes}
+                      onChange={(e) =>
+                        editingNote
+                          ? setEditingNote({ ...editingNote, notes: e.target.value })
+                          : setNewNote({ ...newNote, notes: e.target.value })
+                      }
+                      className="w-full h-[200px] sm:h-[calc(100%-60px)] p-3 resize-none focus:outline-none text-sm"
+                      placeholder={t('notesPlaceholder') || '수업이나 학습 내용을 자세히 기록하세요...'}
+                    />
+                  </div>
+                </div>
+
+                {/* Summary Section */}
+                <div className="border-t-2 border-gray-300 bg-gray-50">
+                  <div className="p-3 border-b border-gray-200 bg-gray-100">
+                    <h4 className="font-semibold text-gray-800 text-sm">{t('summarySection') || '요약'}</h4>
+                    <p className="text-xs text-gray-600 mt-0.5">{t('summaryDescription') || '핵심 내용을 2-3문장으로 요약'}</p>
+                  </div>
+                  <textarea
+                    value={editingNote ? editingNote.summary : newNote.summary}
+                    onChange={(e) =>
+                      editingNote
+                        ? setEditingNote({ ...editingNote, summary: e.target.value })
+                        : setNewNote({ ...newNote, summary: e.target.value })
+                    }
+                    rows={3}
+                    className="w-full p-3 bg-transparent resize-none focus:outline-none text-sm"
+                    placeholder={t('summaryPlaceholder') || '학습한 내용의 핵심을 요약하세요...'}
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t('content')}</label>
-                <textarea
-                  value={editingNote ? editingNote.content : newNote.content}
-                  onChange={(e) =>
-                    editingNote
-                      ? setEditingNote({ ...editingNote, content: e.target.value })
-                      : setNewNote({ ...newNote, content: e.target.value })
-                  }
-                  rows={8}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                  placeholder="Write your notes here..."
-                />
-              </div>
-
-              <div className="flex gap-3 pt-2">
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-6">
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
                 >
                   {t('cancel')}
                 </button>
                 <button
                   onClick={editingNote ? handleUpdateNote : handleAddNote}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
                 >
                   {editingNote ? t('saveChanges') : t('createNote')}
                 </button>
@@ -312,48 +398,91 @@ export default function Notes() {
         </div>
       )}
 
-      {/* View Note Modal */}
+      {/* View Note Modal - Cornell Format */}
       {isViewModalOpen && selectedNote && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsViewModalOpen(false)} />
-          <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div
-              className="w-full h-2 rounded-full mb-4"
-              style={{ backgroundColor: selectedNote.color }}
-            />
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900">{selectedNote.title}</h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  {getSubjectTranslation(selectedNote.subject)} • {selectedNote.date}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => openEditModal(selectedNote)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
-                  title={t('edit')}
-                >
-                  <Edit3 className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleDeleteNote(selectedNote.id)}
-                  className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500"
-                  title={t('delete')}
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setIsViewModalOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+              <div
+                className="w-full h-1.5 rounded-full mb-3"
+                style={{ backgroundColor: selectedNote.color }}
+              />
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">{selectedNote.title}</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {getSubjectTranslation(selectedNote.subject)} • {selectedNote.date}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => openEditModal(selectedNote)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
+                    title={t('edit')}
+                  >
+                    <Edit3 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteNote(selectedNote.id)}
+                    className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-500"
+                    title={t('delete')}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setIsViewModalOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="prose max-w-none">
-              <p className="text-gray-700 whitespace-pre-wrap">{selectedNote.content}</p>
+            {/* Cornell Note View */}
+            <div className="p-6">
+              <div className="border-2 border-gray-200 rounded-xl overflow-hidden">
+                {/* Main Content Area */}
+                <div className="flex flex-col sm:flex-row min-h-[300px]">
+                  {/* Cue Column */}
+                  <div className="sm:w-1/3 bg-indigo-50 border-b sm:border-b-0 sm:border-r border-gray-200">
+                    <div className="p-3 border-b border-gray-200 bg-indigo-100">
+                      <h4 className="font-semibold text-indigo-800 text-sm">{t('cueColumn') || '단서/질문'}</h4>
+                    </div>
+                    <div className="p-4">
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                        {selectedNote.cues || <span className="text-gray-400 italic">{t('noCues') || '단서가 없습니다'}</span>}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Notes Column */}
+                  <div className="sm:w-2/3">
+                    <div className="p-3 border-b border-gray-200 bg-gray-100">
+                      <h4 className="font-semibold text-gray-800 text-sm">{t('notesColumn') || '노트'}</h4>
+                    </div>
+                    <div className="p-4">
+                      <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                        {selectedNote.notes || selectedNote.content || <span className="text-gray-400 italic">{t('noNotes') || '노트가 없습니다'}</span>}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Summary Section */}
+                <div className="border-t-2 border-gray-200 bg-gray-50">
+                  <div className="p-3 border-b border-gray-200 bg-gray-100">
+                    <h4 className="font-semibold text-gray-800 text-sm">{t('summarySection') || '요약'}</h4>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                      {selectedNote.summary || <span className="text-gray-400 italic">{t('noSummary') || '요약이 없습니다'}</span>}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

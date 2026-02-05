@@ -23,44 +23,9 @@ const getNestedValue = (obj, path) => {
 }
 
 // Default values
-const defaultSessions = [
-  {
-    id: 1,
-    title: 'Mathematics Study',
-    date: '2026-01-19',
-    startTime: '09:00',
-    endTime: '11:00',
-    subject: 'Mathematics',
-    color: 'bg-indigo-600',
-  },
-]
+const defaultSessions = []
 
-const defaultNotes = [
-  {
-    id: 1,
-    title: 'next.js 기초',
-    subject: 'Other',
-    date: 'Jan 18, 2026',
-    content: 'Next.js 기초 학습 내용',
-    color: 'rgb(100, 116, 139)',
-  },
-  {
-    id: 2,
-    title: 'Introduction to Derivatives',
-    subject: 'Mathematics',
-    date: 'Jan 18, 2026',
-    content: 'Derivatives are fundamental to calculus, representing rates of change. Master the power rule and memorize common derivative formulas for faster problem solving.\n\nKey formulas:\n- d/dx(x^n) = nx^(n-1)\n- d/dx(e^x) = e^x\n- d/dx(ln x) = 1/x',
-    color: 'rgb(99, 102, 241)',
-  },
-  {
-    id: 3,
-    title: "Newton's Laws of Motion",
-    subject: 'Physics',
-    date: 'Jan 17, 2026',
-    content: "Newton's three laws form the foundation of classical mechanics. Understanding these laws helps predict motion and forces in everyday situations.\n\n1. First Law (Inertia): An object at rest stays at rest, and an object in motion stays in motion unless acted upon by an external force.\n\n2. Second Law: F = ma\n\n3. Third Law: For every action, there is an equal and opposite reaction.",
-    color: 'rgb(244, 63, 94)',
-  },
-]
+const defaultNotes = []
 
 const defaultSettings = {
   theme: 'light',
