@@ -1,14 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
 import { BookOpen, Loader2 } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 
 export default function LoginForm() {
   const { t } = useApp()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        'Configuration': 'Server configuration error - check NEXTAUTH_URL and NEXTAUTH_SECRET',
+        'AccessDenied': 'Access denied',
+        'Verification': 'Token verification failed',
+        'OAuthSignin': 'OAuth sign in error - check redirect URI',
+        'OAuthCallback': 'OAuth callback error - check Google credentials',
+        'OAuthCreateAccount': 'Could not create OAuth account',
+        'EmailCreateAccount': 'Could not create email account',
+        'Callback': 'Callback error',
+        'OAuthAccountNotLinked': 'Account already linked to another provider',
+        'Default': 'Authentication error',
+      }
+      setError(errorMessages[errorParam] || `Error: ${errorParam}`)
+    }
+  }, [searchParams])
 
   const handleGoogleLogin = async () => {
     setLoading(true)
