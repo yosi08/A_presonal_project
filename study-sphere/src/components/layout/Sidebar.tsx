@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { Home, Calendar, BookOpen, Settings, LogOut, GraduationCap, Timer } from 'lucide-react'
+import { Home, Calendar, BookOpen, Settings, LogOut, Timer } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 
 export default function Sidebar({ user }) {
@@ -31,11 +32,15 @@ export default function Sidebar({ user }) {
       <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 hidden lg:flex flex-col">
         {/* Logo */}
         <Link href="/home" className="flex items-center gap-3 px-6 py-5 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer">
-          <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
-            <GraduationCap className="w-6 h-6 text-white" />
-          </div>
+          <Image
+            src="/logo.png"
+            alt="StudySphere Logo"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
           <div>
-            <h1 className="font-bold text-gray-900 text-lg">{t('studyPlan')}</h1>
+            <h1 className="font-bold text-gray-900 text-lg">StudySphere</h1>
             <p className="text-xs text-gray-500">{t('studyManagement')}</p>
           </div>
         </Link>

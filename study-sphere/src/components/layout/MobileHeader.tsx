@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { Menu, X, Home, Calendar, BookOpen, Settings, GraduationCap, LogOut, Timer } from 'lucide-react'
+import { Menu, X, Home, Calendar, BookOpen, Settings, LogOut, Timer } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 
 export default function MobileHeader({ user }) {
@@ -32,10 +33,14 @@ export default function MobileHeader({ user }) {
       <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link href="/home" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-gray-900">{t('studyPlan')}</span>
+            <Image
+              src="/logo.png"
+              alt="StudySphere Logo"
+              width={36}
+              height={36}
+              className="object-contain"
+            />
+            <span className="font-bold text-gray-900">StudySphere</span>
           </Link>
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -56,11 +61,15 @@ export default function MobileHeader({ user }) {
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-3 px-6 py-5 border-b border-gray-100 hover:bg-gray-50 transition-colors"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
+              <Image
+                src="/logo.png"
+                alt="StudySphere Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+              />
               <div>
-                <h1 className="font-bold text-gray-900 text-lg">{t('studyPlan')}</h1>
+                <h1 className="font-bold text-gray-900 text-lg">StudySphere</h1>
                 <p className="text-xs text-gray-500">{t('studyManagement')}</p>
               </div>
             </Link>
