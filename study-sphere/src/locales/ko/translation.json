@@ -92,6 +92,8 @@
     "studyRemindersDesc": "학습 세션 시작 전에 알림을 받습니다",
     "weeklyReport": "주간 리포트",
     "weeklyReportDesc": "주간 진행 상황 요약을 받습니다",
+    "notificationPermissionDenied": "브라우저 알림 권한이 차단되었습니다. 브라우저 설정에서 알림을 허용해주세요.",
+    "notificationPermissionGranted": "브라우저 알림이 활성화되었습니다. 세션 시작 5분 전에 알림을 받습니다.",
     "customizeAppearance": "앱 외관을 커스터마이즈하세요",
     "theme": "테마",
     "light": "라이트",

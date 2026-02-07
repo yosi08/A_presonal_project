@@ -92,6 +92,8 @@
     "studyRemindersDesc": "Get notified before your study sessions start",
     "weeklyReport": "Weekly Report",
     "weeklyReportDesc": "Receive a weekly summary of your progress",
+    "notificationPermissionDenied": "Browser notification permission is blocked. Please allow notifications in your browser settings.",
+    "notificationPermissionGranted": "Browser notifications are enabled. You'll be notified 5 minutes before your sessions start.",
     "customizeAppearance": "Customize how the app looks",
     "theme": "Theme",
     "light": "Light",

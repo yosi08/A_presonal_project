@@ -7,7 +7,7 @@ import { useApp } from '@/context/AppContext'
 
 export default function Settings() {
   const { data: session } = useSession()
-  const { t, language, setLanguage, settings, setSettings } = useApp()
+  const { t, language, setLanguage, settings, setSettings, requestNotificationPermission, notificationPermission } = useApp()
   const [activeTab, setActiveTab] = useState('profile')
   const [saved, setSaved] = useState(false)
 
@@ -32,12 +32,20 @@ export default function Settings() {
     })
   }
 
-  const handleNotificationChange = (key) => {
+  const handleNotificationChange = async (key) => {
+    const newValue = !settings.notifications[key]
+
+    // Request browser notification permission when enabling studyReminders
+    if (key === 'studyReminders' && newValue) {
+      const permission = await requestNotificationPermission()
+      if (permission === 'denied') return
+    }
+
     setSettings({
       ...settings,
       notifications: {
         ...settings.notifications,
-        [key]: !settings.notifications[key],
+        [key]: newValue,
       },
     })
   }
@@ -175,23 +183,31 @@ export default function Settings() {
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                      <div>
-                        <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('studyReminders')}</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{t('studyRemindersDesc')}</p>
-                      </div>
-                      <button
-                        onClick={() => handleNotificationChange('studyReminders')}
-                        className={`relative w-12 h-6 rounded-full transition-colors ${
-                          settings.notifications.studyReminders ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
-                        }`}
-                      >
-                        <span
-                          className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                            settings.notifications.studyReminders ? 'left-7' : 'left-1'
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('studyReminders')}</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{t('studyRemindersDesc')}</p>
+                        </div>
+                        <button
+                          onClick={() => handleNotificationChange('studyReminders')}
+                          className={`relative w-12 h-6 rounded-full transition-colors ${
+                            settings.notifications.studyReminders ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
                           }`}
-                        />
-                      </button>
+                        >
+                          <span
+                            className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                              settings.notifications.studyReminders ? 'left-7' : 'left-1'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                      {settings.notifications.studyReminders && notificationPermission === 'denied' && (
+                        <p className="text-sm text-red-500 mt-2">{t('notificationPermissionDenied')}</p>
+                      )}
+                      {settings.notifications.studyReminders && notificationPermission === 'granted' && (
+                        <p className="text-sm text-green-600 dark:text-green-400 mt-2">{t('notificationPermissionGranted')}</p>
+                      )}
                     </div>
 
                     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
