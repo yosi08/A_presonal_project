@@ -41,7 +41,6 @@ const defaultNotes = []
 
 const defaultSettings = {
   theme: 'light',
-  accentColor: 'indigo',
   notifications: {
     emailReminders: true,
     studyReminders: true,

@@ -32,13 +32,6 @@ export default function Settings() {
     })
   }
 
-  const handleAccentColorChange = (accentColor) => {
-    setSettings({
-      ...settings,
-      accentColor,
-    })
-  }
-
   const handleNotificationChange = (key) => {
     setSettings({
       ...settings,
@@ -55,15 +48,6 @@ export default function Settings() {
     { id: 'appearance', labelKey: 'appearance', icon: Palette },
     { id: 'language', labelKey: 'language', icon: Globe },
     { id: 'privacy', labelKey: 'privacy', icon: Shield },
-  ]
-
-  const accentColors = [
-    { name: 'indigo', color: 'bg-indigo-600' },
-    { name: 'blue', color: 'bg-blue-600' },
-    { name: 'purple', color: 'bg-purple-600' },
-    { name: 'pink', color: 'bg-pink-600' },
-    { name: 'red', color: 'bg-red-600' },
-    { name: 'green', color: 'bg-green-600' },
   ]
 
   const languages = [
@@ -268,24 +252,6 @@ export default function Settings() {
                     </div>
                   </div>
 
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-3">{t('accentColor')}</h3>
-                    <div className="flex gap-3">
-                      {accentColors.map((color) => (
-                        <button
-                          key={color.name}
-                          onClick={() => handleAccentColorChange(color.name)}
-                          className={`w-10 h-10 rounded-full ${color.color} flex items-center justify-center transition-transform ${
-                            settings.accentColor === color.name ? 'scale-110 ring-2 ring-offset-2 ring-gray-400' : ''
-                          }`}
-                        >
-                          {settings.accentColor === color.name && (
-                            <Check className="w-5 h-5 text-white" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               )}
 
