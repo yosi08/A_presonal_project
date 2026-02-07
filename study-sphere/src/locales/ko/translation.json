@@ -107,6 +107,8 @@
     "enable2FA": "2FA 활성화",
     "deleteAccount": "계정 삭제",
     "deleteAccountDesc": "계정과 모든 관련 데이터를 영구적으로 삭제합니다",
+    "deleteAccountConfirmMsg": "정말로 계정을 삭제하시겠습니까? 모든 데이터(세션, 노트, 설정)가 삭제되며 이 작업은 되돌릴 수 없습니다.",
+    "deleting": "삭제 중...",
     "saved": "저장됨!",
     "save": "변경사항 저장",
     "languageSettings": "언어 설정",

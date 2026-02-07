@@ -107,6 +107,8 @@
     "enable2FA": "Enable 2FA",
     "deleteAccount": "Delete Account",
     "deleteAccountDesc": "Permanently delete your account and all associated data",
+    "deleteAccountConfirmMsg": "Are you sure you want to delete your account? All data (sessions, notes, settings) will be permanently deleted and cannot be recovered.",
+    "deleting": "Deleting...",
     "saved": "Saved!",
     "save": "Save Changes",
     "languageSettings": "Language Settings",

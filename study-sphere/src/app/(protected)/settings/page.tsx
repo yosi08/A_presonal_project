@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { User, Bell, Palette, Shield, Save, Check, Globe, Camera } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 
@@ -10,6 +10,8 @@ export default function Settings() {
   const { t, language, setLanguage, settings, setSettings, requestNotificationPermission, notificationPermission } = useApp()
   const [activeTab, setActiveTab] = useState('profile')
   const [saved, setSaved] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const user = session?.user || { name: 'User', email: '' }
 
@@ -23,6 +25,21 @@ export default function Settings() {
   const handleSave = () => {
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true)
+    try {
+      localStorage.removeItem('sessions')
+      localStorage.removeItem('notes')
+      localStorage.removeItem('settings')
+      localStorage.removeItem('language')
+      localStorage.removeItem('lastEmailDate')
+      localStorage.removeItem('lastWeeklyReportDate')
+      await signOut({ callbackUrl: '/login' })
+    } catch {
+      setDeleting(false)
+    }
   }
 
   const handleThemeChange = (theme) => {
@@ -322,7 +339,10 @@ export default function Settings() {
                       <p className="text-sm text-red-600 dark:text-red-400 mb-3">
                         {t('deleteAccountDesc')}
                       </p>
-                      <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
+                      <button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                      >
                         {t('deleteAccount')}
                       </button>
                     </div>
@@ -333,6 +353,35 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/50" onClick={() => !deleting && setShowDeleteConfirm(false)} />
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">{t('deleteAccount')}</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">
+              {t('deleteAccountConfirmMsg') || '정말로 계정을 삭제하시겠습니까? 모든 데이터(세션, 노트, 설정)가 삭제되며 이 작업은 되돌릴 수 없습니다.'}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleting}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium disabled:opacity-50"
+              >
+                {deleting ? t('deleting') || '삭제 중...' : t('deleteAccount')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
