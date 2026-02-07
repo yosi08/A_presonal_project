@@ -85,14 +85,14 @@ export default function MobileHeader({ user }) {
                         onClick={() => setIsOpen(false)}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           active
-                            ? 'bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400'
+                            ? 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
                         }`}
                       >
-                        <item.icon className={`w-5 h-5 ${active ? 'text-green-600 dark:text-green-400' : ''}`} />
+                        <item.icon className={`w-5 h-5 ${active ? 'text-blue-600 dark:text-blue-400' : ''}`} />
                         <span className="font-medium">{t(item.labelKey)}</span>
                         {active && (
-                          <div className="ml-auto w-1.5 h-1.5 bg-green-600 dark:bg-green-400 rounded-full" />
+                          <div className="ml-auto w-1.5 h-1.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
                         )}
                       </Link>
                     </li>
@@ -110,7 +110,7 @@ export default function MobileHeader({ user }) {
                     className="w-10 h-10 rounded-full"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-semibold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
                     {user?.name?.charAt(0) || 'U'}
                   </div>
                 )}
