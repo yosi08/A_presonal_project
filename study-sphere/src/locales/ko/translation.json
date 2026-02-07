@@ -8,8 +8,8 @@
     "studyManagement": "학습 관리"
   },
   "home": {
-    "welcomeBack": "환영합니다",
-    "stayOrganized": "강력한 계획 도구로 학습을 체계적으로 관리하세요.",
+    "welcomeBack": "드디어 공부할 마음이 생겼구나",
+    "stayOrganized": "공부해라 이러다 대학도 못 간다 고졸 인생으로는 살지 말자.",
     "today": "오늘",
     "thisWeek": "이번 주",
     "sessions": "세션",
@@ -54,7 +54,7 @@
     "cueDescription": "키워드, 질문, 핵심 개념",
     "cuePlaceholder": "• 주요 키워드\n• 핵심 질문\n• 중요 개념",
     "notesColumn": "노트",
-    "notesDescription": "수업 내용, 상세 설명, 예시",
+    "notesDescription": "수업 내용, 상세 설명",
     "notesPlaceholder": "수업이나 학습 내용을 자세히 기록하세요",
     "summarySection": "요약",
     "summaryDescription": "핵심 내용을 2-3문장으로 요약",

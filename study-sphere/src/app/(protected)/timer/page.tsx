@@ -87,7 +87,7 @@ export default function Timer() {
   const strokeDashoffset = circumference - (progress / 100) * circumference
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -108,13 +108,13 @@ export default function Timer() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-4">
         {/* Main Timer Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-6">
           {/* Status */}
           <div className="text-center mb-8">
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
               isStudyTime
-                ? 'bg-indigo-100 text-indigo-700'
-                : 'bg-green-100 text-green-700'
+                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
+                : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
             }`}>
               {isStudyTime ? (
                 <>
@@ -138,7 +138,7 @@ export default function Timer() {
                   cx="128"
                   cy="128"
                   r="120"
-                  stroke="#e5e7eb"
+                  className="stroke-gray-200 dark:stroke-gray-700"
                   strokeWidth="8"
                   fill="none"
                 />
@@ -156,10 +156,10 @@ export default function Timer() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-5xl font-bold text-gray-900">
+                <span className="text-5xl font-bold text-gray-900 dark:text-gray-100">
                   {formatTime(timeLeft)}
                 </span>
-                <span className="text-sm text-gray-500 mt-2">
+                <span className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   {t('cycle')} {currentCycle} / {totalCycles}
                 </span>
               </div>
@@ -170,10 +170,10 @@ export default function Timer() {
           <div className="flex justify-center gap-4">
             <button
               onClick={resetTimer}
-              className="p-4 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+              className="p-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
               title={t('reset')}
             >
-              <RotateCcw className="w-6 h-6 text-gray-600" />
+              <RotateCcw className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             </button>
             <button
               onClick={toggleTimer}
@@ -191,17 +191,17 @@ export default function Timer() {
             </button>
             <button
               onClick={() => setShowSettings(true)}
-              className="p-4 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+              className="p-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
               title={t('settings')}
             >
-              <Settings className="w-6 h-6 text-gray-600" />
+              <Settings className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
         </div>
 
         {/* Cycle Progress */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">{t('cycleProgress')}</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('cycleProgress')}</h3>
           <div className="flex gap-2 flex-wrap">
             {Array.from({ length: totalCycles }, (_, i) => (
               <div
@@ -213,14 +213,14 @@ export default function Timer() {
                     ? isStudyTime
                       ? 'bg-indigo-600 text-white'
                       : 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-400'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'
                 }`}
               >
                 {i + 1}
               </div>
             ))}
           </div>
-          <div className="mt-4 text-sm text-gray-500">
+          <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
             {t('completedCycles')}: {completedCycles} / {totalCycles}
           </div>
         </div>
@@ -230,12 +230,12 @@ export default function Timer() {
       {showSettings && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="fixed inset-0 bg-black/50" onClick={() => setShowSettings(false)} />
-          <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('timerSettings')}</h3>
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('timerSettings')}</h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('studyDuration')} ({t('minutes')})
                 </label>
                 <input
@@ -244,12 +244,12 @@ export default function Timer() {
                   max="120"
                   value={studyMinutes}
                   onChange={(e) => setStudyMinutes(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('breakDuration')} ({t('minutes')})
                 </label>
                 <input
@@ -258,12 +258,12 @@ export default function Timer() {
                   max="60"
                   value={breakMinutes}
                   onChange={(e) => setBreakMinutes(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('numberOfCycles')}
                 </label>
                 <input
@@ -272,7 +272,7 @@ export default function Timer() {
                   max="10"
                   value={totalCycles}
                   onChange={(e) => setTotalCycles(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -280,7 +280,7 @@ export default function Timer() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowSettings(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 {t('cancel')}
               </button>

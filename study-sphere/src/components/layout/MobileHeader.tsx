@@ -30,7 +30,7 @@ export default function MobileHeader({ user }) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 lg:hidden">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <Link href="/home" className="flex items-center gap-3">
             <Image
@@ -40,11 +40,11 @@ export default function MobileHeader({ user }) {
               height={36}
               className="object-contain"
             />
-            <span className="font-bold text-gray-900">StudySphere</span>
+            <span className="font-bold text-gray-900 dark:text-gray-100">StudySphere</span>
           </Link>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors text-gray-900 dark:text-gray-100"
           >
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -55,11 +55,11 @@ export default function MobileHeader({ user }) {
       {isOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-black/50" onClick={() => setIsOpen(false)} />
-          <div className="fixed top-0 left-0 bottom-0 w-64 bg-white shadow-xl">
+          <div className="fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-gray-900 shadow-xl">
             <Link
               href="/home"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-6 py-5 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 px-6 py-5 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <Image
                 src="/logo.png"
@@ -69,8 +69,8 @@ export default function MobileHeader({ user }) {
                 className="object-contain"
               />
               <div>
-                <h1 className="font-bold text-gray-900 text-lg">StudySphere</h1>
-                <p className="text-xs text-gray-500">{t('studyManagement')}</p>
+                <h1 className="font-bold text-gray-900 dark:text-gray-100 text-lg">StudySphere</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('studyManagement')}</p>
               </div>
             </Link>
 
@@ -85,14 +85,14 @@ export default function MobileHeader({ user }) {
                         onClick={() => setIsOpen(false)}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                           active
-                            ? 'bg-indigo-50 text-indigo-600'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                            ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
                         }`}
                       >
-                        <item.icon className={`w-5 h-5 ${active ? 'text-indigo-600' : ''}`} />
+                        <item.icon className={`w-5 h-5 ${active ? 'text-indigo-600 dark:text-indigo-400' : ''}`} />
                         <span className="font-medium">{t(item.labelKey)}</span>
                         {active && (
-                          <div className="ml-auto w-1.5 h-1.5 bg-indigo-600 rounded-full" />
+                          <div className="ml-auto w-1.5 h-1.5 bg-indigo-600 dark:bg-indigo-400 rounded-full" />
                         )}
                       </Link>
                     </li>
@@ -101,8 +101,8 @@ export default function MobileHeader({ user }) {
               </ul>
             </nav>
 
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100">
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50">
+            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800">
                 {user?.image ? (
                   <img
                     src={user.image}
@@ -115,12 +115,12 @@ export default function MobileHeader({ user }) {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">{user?.name || 'User'}</p>
-                  <p className="text-xs text-gray-500 truncate">{user?.email || ''}</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{user?.name || 'User'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email || ''}</p>
                 </div>
                 <button
                   onClick={() => setShowLogoutConfirm(true)}
-                  className="shrink-0 text-gray-400 hover:text-red-500 p-2"
+                  className="shrink-0 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 p-2"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -134,13 +134,13 @@ export default function MobileHeader({ user }) {
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
           <div className="fixed inset-0 bg-black/50" onClick={() => setShowLogoutConfirm(false)} />
-          <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('logout')}</h3>
-            <p className="text-gray-600 mb-6">{t('logoutConfirm')}</p>
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-sm mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('logout')}</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">{t('logoutConfirm')}</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLogoutConfirm(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 {t('no')}
               </button>

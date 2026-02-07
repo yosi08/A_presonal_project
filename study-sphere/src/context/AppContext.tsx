@@ -97,6 +97,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [settings, isHydrated])
 
+  // Apply dark mode class to <html>
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (settings.theme === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    }
+  }, [settings.theme])
+
   // Translation function
   const t = (key) => {
     const langData = translations[language]

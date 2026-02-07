@@ -12,7 +12,7 @@ export default async function ProtectedLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar user={session.user} />
       <MobileHeader user={session.user} />
       <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
