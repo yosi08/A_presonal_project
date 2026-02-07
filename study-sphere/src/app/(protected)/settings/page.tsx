@@ -64,12 +64,12 @@ export default function Settings() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white">
+      <div className="bg-gradient-to-r from-green-600 via-green-700 to-emerald-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl font-bold">{t('settings')}</h1>
-          <p className="text-indigo-100 mt-1">{t('manageAccount')}</p>
+          <p className="text-green-100 mt-1">{t('manageAccount')}</p>
         </div>
       </div>
 
@@ -86,7 +86,7 @@ export default function Settings() {
                         onClick={() => setActiveTab(tab.id)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${
                           activeTab === tab.id
-                            ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400'
+                            ? 'bg-green-50 dark:bg-green-950 text-green-600 dark:text-green-400'
                             : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                       >
@@ -118,7 +118,7 @@ export default function Settings() {
                           className="w-20 h-20 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                        <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                           {(user.name || 'U').charAt(0).toUpperCase()}
                         </div>
                       )}
@@ -172,7 +172,7 @@ export default function Settings() {
                       <button
                         onClick={() => handleNotificationChange('emailReminders')}
                         className={`relative w-12 h-6 rounded-full transition-colors ${
-                          settings.notifications.emailReminders ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
+                          settings.notifications.emailReminders ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
                         }`}
                       >
                         <span
@@ -192,7 +192,7 @@ export default function Settings() {
                         <button
                           onClick={() => handleNotificationChange('studyReminders')}
                           className={`relative w-12 h-6 rounded-full transition-colors ${
-                            settings.notifications.studyReminders ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
+                            settings.notifications.studyReminders ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
                           }`}
                         >
                           <span
@@ -218,7 +218,7 @@ export default function Settings() {
                       <button
                         onClick={() => handleNotificationChange('weeklyReport')}
                         className={`relative w-12 h-6 rounded-full transition-colors ${
-                          settings.notifications.weeklyReport ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-gray-600'
+                          settings.notifications.weeklyReport ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
                         }`}
                       >
                         <span
@@ -247,7 +247,7 @@ export default function Settings() {
                         onClick={() => handleThemeChange('light')}
                         className={`p-4 rounded-lg border-2 transition-colors ${
                           settings.theme === 'light'
-                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950'
+                            ? 'border-green-600 bg-green-50 dark:bg-green-950'
                             : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                       >
@@ -258,7 +258,7 @@ export default function Settings() {
                         onClick={() => handleThemeChange('dark')}
                         className={`p-4 rounded-lg border-2 transition-colors ${
                           settings.theme === 'dark'
-                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950'
+                            ? 'border-green-600 bg-green-50 dark:bg-green-950'
                             : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                       >
@@ -286,7 +286,7 @@ export default function Settings() {
                         onClick={() => setLanguage(lang.code)}
                         className={`w-full flex items-center gap-4 p-4 rounded-lg border-2 transition-colors ${
                           language === lang.code
-                            ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950'
+                            ? 'border-green-600 bg-green-50 dark:bg-green-950'
                             : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                       >
@@ -298,7 +298,7 @@ export default function Settings() {
                           </p>
                         </div>
                         {language === lang.code && (
-                          <div className="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
                             <Check className="w-4 h-4 text-white" />
                           </div>
                         )}

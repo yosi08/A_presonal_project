@@ -116,14 +116,14 @@ export default function Notes() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white">
+      <div className="bg-gradient-to-r from-green-600 via-green-700 to-emerald-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold">{t('notes')}</h1>
-              <p className="text-indigo-100 mt-1">{t('cornellNoteDescription') || '코넬 노트 방식으로 효율적인 학습을 하세요'}</p>
+              <p className="text-green-100 mt-1">{t('cornellNoteDescription') || '코넬 노트 방식으로 효율적인 학습을 하세요'}</p>
             </div>
             <button
               onClick={() => {
@@ -131,7 +131,7 @@ export default function Notes() {
                 setNewNote({ title: '', subject: 'Other', cues: '', notes: '', summary: '' })
                 setIsModalOpen(true)
               }}
-              className="inline-flex items-center gap-2 bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors font-medium shadow"
+              className="inline-flex items-center gap-2 bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 transition-colors font-medium shadow"
             >
               <Plus className="w-5 h-5" />
               {t('newNote')}
@@ -152,7 +152,7 @@ export default function Notes() {
                 placeholder={t('searchNotes')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
 
@@ -162,7 +162,7 @@ export default function Notes() {
                 onClick={() => setSelectedSubject('All')}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   selectedSubject === 'All'
-                    ? 'bg-indigo-600 text-white'
+                    ? 'bg-green-600 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 }`}
               >
@@ -208,7 +208,7 @@ export default function Notes() {
                 setNewNote({ title: '', subject: 'Other', cues: '', notes: '', summary: '' })
                 setIsModalOpen(true)
               }}
-              className="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+              className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
               <Plus className="w-5 h-5" />
               {t('createNote')}
@@ -220,7 +220,7 @@ export default function Notes() {
               <div
                 key={note.id}
                 onClick={() => openViewModal(note)}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-800"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden cursor-pointer hover:shadow-xl transition-shadow border border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-800"
               >
                 <div className="p-4">
                   <div
@@ -236,8 +236,8 @@ export default function Notes() {
                   <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
                     <div className="flex min-h-[80px]">
                       {/* Cue area */}
-                      <div className="w-1/3 bg-indigo-50 dark:bg-indigo-950 p-2 border-r border-gray-200 dark:border-gray-600">
-                        <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mb-1">Cue</p>
+                      <div className="w-1/3 bg-green-50 dark:bg-green-950 p-2 border-r border-gray-200 dark:border-gray-600">
+                        <p className="text-xs text-green-600 dark:text-green-400 font-medium mb-1">Cue</p>
                         <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-3">{note.cues || '-'}</p>
                       </div>
                       {/* Notes area */}
@@ -290,7 +290,7 @@ export default function Notes() {
                         ? setEditingNote({ ...editingNote, title: e.target.value })
                         : setNewNote({ ...newNote, title: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder={t('noteTitlePlaceholder') || '노트 제목을 입력하세요'}
                   />
                 </div>
@@ -303,7 +303,7 @@ export default function Notes() {
                         ? setEditingNote({ ...editingNote, subject: e.target.value })
                         : setNewNote({ ...newNote, subject: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   >
                     {SUBJECTS.map((subject) => (
                       <option key={subject.name} value={subject.name}>
@@ -319,10 +319,10 @@ export default function Notes() {
                 {/* Main Content Area */}
                 <div className="flex flex-col sm:flex-row min-h-[300px]">
                   {/* Cue Column */}
-                  <div className="sm:w-1/3 bg-indigo-50 dark:bg-indigo-950 border-b sm:border-b-0 sm:border-r border-gray-300 dark:border-gray-600">
-                    <div className="p-3 border-b border-gray-300 dark:border-gray-600 bg-indigo-100 dark:bg-indigo-900">
-                      <h4 className="font-semibold text-indigo-800 dark:text-indigo-200 text-sm">{t('cueColumn') || '단서/질문'}</h4>
-                      <p className="text-xs text-indigo-600 dark:text-indigo-400 mt-0.5">{t('cueDescription') || '키워드, 질문, 핵심 개념'}</p>
+                  <div className="sm:w-1/3 bg-green-50 dark:bg-green-950 border-b sm:border-b-0 sm:border-r border-gray-300 dark:border-gray-600">
+                    <div className="p-3 border-b border-gray-300 dark:border-gray-600 bg-green-100 dark:bg-green-900">
+                      <h4 className="font-semibold text-green-800 dark:text-green-200 text-sm">{t('cueColumn') || '단서/질문'}</h4>
+                      <p className="text-xs text-green-600 dark:text-green-400 mt-0.5">{t('cueDescription') || '키워드, 질문, 핵심 개념'}</p>
                     </div>
                     <textarea
                       value={editingNote ? editingNote.cues : newNote.cues}
@@ -385,7 +385,7 @@ export default function Notes() {
                 </button>
                 <button
                   onClick={editingNote ? handleUpdateNote : handleAddNote}
-                  className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                  className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                 >
                   {editingNote ? t('saveChanges') : t('createNote')}
                 </button>
@@ -444,9 +444,9 @@ export default function Notes() {
                 {/* Main Content Area */}
                 <div className="flex flex-col sm:flex-row min-h-[300px]">
                   {/* Cue Column */}
-                  <div className="sm:w-1/3 bg-indigo-50 dark:bg-indigo-950 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-600">
-                    <div className="p-3 border-b border-gray-200 dark:border-gray-600 bg-indigo-100 dark:bg-indigo-900">
-                      <h4 className="font-semibold text-indigo-800 dark:text-indigo-200 text-sm">{t('cueColumn') || '단서/질문'}</h4>
+                  <div className="sm:w-1/3 bg-green-50 dark:bg-green-950 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-600">
+                    <div className="p-3 border-b border-gray-200 dark:border-gray-600 bg-green-100 dark:bg-green-900">
+                      <h4 className="font-semibold text-green-800 dark:text-green-200 text-sm">{t('cueColumn') || '단서/질문'}</h4>
                     </div>
                     <div className="p-4">
                       <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">

@@ -80,7 +80,7 @@ export default function Calendar() {
           id: Date.now(),
           ...newSession,
           date: dateStr,
-          color: 'bg-indigo-600',
+          color: 'bg-green-600',
         },
       ])
     }
@@ -129,16 +129,16 @@ export default function Calendar() {
           key={day}
           onClick={() => setSelectedDate(new Date(year, month, day))}
           className={`h-12 sm:h-24 border border-gray-100 dark:border-gray-700 p-1 sm:p-2 cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
-            isSelected(day) ? 'bg-indigo-50 dark:bg-indigo-950 border-indigo-200 dark:border-indigo-800' : ''
+            isSelected(day) ? 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800' : ''
           }`}
         >
           <div className="flex justify-between items-start">
             <span
               className={`inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 text-sm rounded-full ${
                 isToday(day)
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-green-600 text-white'
                   : isSelected(day)
-                  ? 'text-indigo-600 dark:text-indigo-400 font-semibold'
+                  ? 'text-green-600 dark:text-green-400 font-semibold'
                   : 'text-gray-700 dark:text-gray-300'
               }`}
             >
@@ -176,12 +176,12 @@ export default function Calendar() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white">
+      <div className="bg-gradient-to-r from-green-600 via-green-700 to-emerald-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl font-bold">{t('calendar')}</h1>
-          <p className="text-indigo-100 mt-1">{t('manageSchedule')}</p>
+          <p className="text-green-100 mt-1">{t('manageSchedule')}</p>
         </div>
       </div>
 
@@ -241,7 +241,7 @@ export default function Calendar() {
                 </div>
                 <button
                   onClick={openAddModal}
-                  className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                   <Plus className="w-5 h-5" />
                 </button>
@@ -255,7 +255,7 @@ export default function Calendar() {
                   <p className="text-gray-500 dark:text-gray-400 text-sm">{t('noSessionsScheduled')}</p>
                   <button
                     onClick={openAddModal}
-                    className="mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+                    className="mt-3 text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium"
                   >
                     {t('addASession')}
                   </button>
@@ -265,7 +265,7 @@ export default function Calendar() {
                   {selectedDateSessions.map((session) => (
                     <div
                       key={session.id}
-                      className="p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors"
+                      className="p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-800 transition-colors"
                     >
                       <div className="flex items-start gap-3">
                         <div className={`w-1 h-full min-h-[40px] rounded-full ${session.color}`} />
@@ -281,7 +281,7 @@ export default function Calendar() {
                         <div className="flex gap-1">
                           <button
                             onClick={() => handleEditSession(session)}
-                            className="p-1.5 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 rounded transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-950 rounded transition-colors"
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
@@ -326,7 +326,7 @@ export default function Calendar() {
                   type="text"
                   value={newSession.title}
                   onChange={(e) => setNewSession({ ...newSession, title: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="Study session title"
                 />
               </div>
@@ -338,7 +338,7 @@ export default function Calendar() {
                     type="time"
                     value={newSession.startTime}
                     onChange={(e) => setNewSession({ ...newSession, startTime: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -347,7 +347,7 @@ export default function Calendar() {
                     type="time"
                     value={newSession.endTime}
                     onChange={(e) => setNewSession({ ...newSession, endTime: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -357,7 +357,7 @@ export default function Calendar() {
                 <select
                   value={newSession.subject}
                   onChange={(e) => setNewSession({ ...newSession, subject: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   <option value="Mathematics">{t('mathematics')}</option>
                   <option value="Physics">{t('physics')}</option>
@@ -377,7 +377,7 @@ export default function Calendar() {
                 </button>
                 <button
                   onClick={handleAddSession}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                   {editingSession ? t('saveChanges') : t('addSession')}
                 </button>

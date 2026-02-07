@@ -87,14 +87,14 @@ export default function Timer() {
   const strokeDashoffset = circumference - (progress / 100) * circumference
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white">
+      <div className="bg-gradient-to-r from-green-600 via-green-700 to-emerald-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">{t('timer')}</h1>
-              <p className="text-indigo-100 mt-1">{t('pomodoroDescription')}</p>
+              <p className="text-green-100 mt-1">{t('pomodoroDescription')}</p>
             </div>
             <button
               onClick={() => setShowSettings(true)}
@@ -113,7 +113,7 @@ export default function Timer() {
           <div className="text-center mb-8">
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${
               isStudyTime
-                ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
+                ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
                 : 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
             }`}>
               {isStudyTime ? (
@@ -146,7 +146,7 @@ export default function Timer() {
                   cx="128"
                   cy="128"
                   r="120"
-                  stroke={isStudyTime ? '#4f46e5' : '#22c55e'}
+                  stroke={isStudyTime ? '#16a34a' : '#22c55e'}
                   strokeWidth="8"
                   fill="none"
                   strokeLinecap="round"
@@ -179,7 +179,7 @@ export default function Timer() {
               onClick={toggleTimer}
               className={`p-6 rounded-full transition-colors ${
                 isStudyTime
-                  ? 'bg-indigo-600 hover:bg-indigo-700'
+                  ? 'bg-green-600 hover:bg-green-700'
                   : 'bg-green-600 hover:bg-green-700'
               } text-white`}
             >
@@ -211,7 +211,7 @@ export default function Timer() {
                     ? 'bg-green-500 text-white'
                     : i === currentCycle - 1
                     ? isStudyTime
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-green-600 text-white'
                       : 'bg-green-600 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'
                 }`}
@@ -244,7 +244,7 @@ export default function Timer() {
                   max="120"
                   value={studyMinutes}
                   onChange={(e) => setStudyMinutes(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
 
@@ -258,7 +258,7 @@ export default function Timer() {
                   max="60"
                   value={breakMinutes}
                   onChange={(e) => setBreakMinutes(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
 
@@ -272,7 +272,7 @@ export default function Timer() {
                   max="10"
                   value={totalCycles}
                   onChange={(e) => setTotalCycles(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -286,7 +286,7 @@ export default function Timer() {
               </button>
               <button
                 onClick={applySettings}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 {t('apply')}
               </button>

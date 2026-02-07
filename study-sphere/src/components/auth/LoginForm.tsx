@@ -48,7 +48,7 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'linear-gradient(160deg, #2563EB, #1E3A8A)' }}>
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -62,12 +62,12 @@ export default function LoginForm() {
             />
           </div>
           <h1 className="text-3xl font-bold text-white">StudySphere</h1>
-          <p className="text-indigo-200 mt-2">{t('studyManagement')}</p>
+          <p className="mt-2" style={{ color: 'rgba(255,255,255,0.85)' }}>{t('studyManagement')}</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
+        <div className="bg-white rounded-2xl shadow-xl p-10">
+          <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-6">
             {t('login')}
           </h2>
 
@@ -80,7 +80,7 @@ export default function LoginForm() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-3 border border-gray-300 rounded-lg hover:bg-[#F8FAFC] transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

@@ -66,15 +66,15 @@ export default function Home() {
   const recentNotes = notes.slice(0, 3)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 text-white">
+      <div className="bg-[#2563EB] text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3">
               {t('welcomeBack')}, {user.name}!
             </h1>
-            <p className="text-indigo-100 text-lg sm:text-xl max-w-2xl">
+            <p className="text-white/80 text-lg sm:text-xl max-w-2xl">
               {t('stayOrganized')}
             </p>
           </div>
@@ -88,7 +88,7 @@ export default function Home() {
                     <stat.icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-indigo-100 text-sm">{t(stat.labelKey)}</p>
+                    <p className="text-white/80 text-sm">{t(stat.labelKey)}</p>
                     <p className="text-2xl font-bold">{stat.value}</p>
                   </div>
                 </div>
@@ -107,7 +107,7 @@ export default function Home() {
               <div className="p-6 flex flex-row items-center justify-between pb-2">
                 <h2 className="text-xl font-semibold dark:text-gray-100">{t('todaysSchedule')}</h2>
                 <Link href="/calendar">
-                  <button className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 px-3 py-2 rounded-md transition-colors font-medium">
+                  <button className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 px-3 py-2 rounded-md transition-colors font-medium">
                     {t('viewCalendar')}
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </button>
@@ -121,7 +121,7 @@ export default function Home() {
                     </div>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">{t('noSessionsToday')}</p>
                     <Link href="/calendar">
-                      <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow">
+                      <button className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow">
                         <Plus className="w-4 h-4 mr-2" />
                         {t('scheduleSession')}
                       </button>
@@ -131,7 +131,7 @@ export default function Home() {
                   <div className="space-y-3">
                     {todaySessions.map((session) => (
                       <Link href="/calendar" key={session.id}>
-                        <div className="p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-md transition-all cursor-pointer">
+                        <div className="p-4 rounded-lg border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md transition-all cursor-pointer">
                           <div className="flex items-start gap-3">
                             <div className={`w-1 h-full min-h-[50px] rounded-full ${session.color}`} />
                             <div className="flex-1">
@@ -139,7 +139,7 @@ export default function Home() {
                               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                                 {session.startTime} - {session.endTime}
                               </p>
-                              <span className="inline-block mt-2 text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded">
+                              <span className="inline-block mt-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
                                 {session.subject}
                               </span>
                             </div>
@@ -166,27 +166,27 @@ export default function Home() {
                       <div
                         className={`flex items-center justify-between p-3 rounded-lg cursor-pointer ${
                           day.isToday
-                            ? 'bg-indigo-50 dark:bg-indigo-950 border border-indigo-100 dark:border-indigo-900'
+                            ? 'bg-blue-50 dark:bg-blue-950 border border-blue-100 dark:border-blue-900'
                             : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-10 h-10 rounded-lg flex flex-col items-center justify-center ${
-                              day.isToday ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-700 dark:text-gray-300'
+                              day.isToday ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 dark:text-gray-300'
                             }`}
                           >
                             <span className="text-xs font-medium">{day.day}</span>
                             <span className="text-sm font-bold">{day.date}</span>
                           </div>
-                          <span className={day.isToday ? 'font-medium text-indigo-900 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-300'}>
+                          <span className={day.isToday ? 'font-medium text-blue-900 dark:text-blue-300' : 'text-gray-600 dark:text-gray-300'}>
                             {t(day.labelKey)}
                           </span>
                         </div>
                         <span
                           className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold ${
                             day.sessions > 0
-                              ? 'bg-indigo-600 text-white border-transparent shadow'
+                              ? 'bg-blue-600 text-white border-transparent shadow'
                               : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400'
                           }`}
                         >
@@ -207,7 +207,7 @@ export default function Home() {
             <div className="p-6 flex flex-row items-center justify-between pb-2">
               <h2 className="text-xl font-semibold dark:text-gray-100">{t('recentNotes')}</h2>
               <Link href="/notes">
-                <button className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950 px-3 py-2 rounded-md transition-colors font-medium">
+                <button className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 px-3 py-2 rounded-md transition-colors font-medium">
                   {t('viewAllNotes')}
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </button>
@@ -221,7 +221,7 @@ export default function Home() {
                   </div>
                   <p className="text-gray-500 dark:text-gray-400 mb-4">{t('createFirstNote')}</p>
                   <Link href="/notes">
-                    <button className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow">
+                    <button className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow">
                       <Plus className="w-4 h-4 mr-2" />
                       {t('createNote')}
                     </button>
@@ -231,12 +231,12 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {recentNotes.map((note) => (
                     <Link href="/notes" key={note.id}>
-                      <div className="p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-800 hover:shadow-md transition-all cursor-pointer group">
+                      <div className="p-4 rounded-xl border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md transition-all cursor-pointer group">
                         <div
                           className="w-full h-1 rounded-full mb-3"
                           style={{ backgroundColor: note.color }}
                         />
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {note.title}
                         </h4>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
