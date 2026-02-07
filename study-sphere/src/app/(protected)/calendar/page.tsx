@@ -4,14 +4,17 @@ import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Plus, Clock, X, Trash2, Edit3 } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-]
+const DAYS = {
+  en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  ko: ['일', '월', '화', '수', '목', '금', '토'],
+}
+const MONTHS = {
+  en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  ko: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+}
 
 export default function Calendar() {
-  const { t, sessions, setSessions } = useApp()
+  const { t, language, sessions, setSessions } = useApp()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -193,7 +196,7 @@ export default function Calendar() {
               {/* Calendar Header */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  {MONTHS[month]} {year}
+                  {(MONTHS[language] || MONTHS.en)[month]} {year}
                 </h2>
                 <div className="flex gap-2">
                   <button
@@ -213,7 +216,7 @@ export default function Calendar() {
 
               {/* Day Headers */}
               <div className="grid grid-cols-7 mb-2">
-                {DAYS.map((day) => (
+                {(DAYS[language] || DAYS.en).map((day) => (
                   <div key={day} className="text-center text-sm font-medium text-gray-500 dark:text-gray-400 py-2">
                     {day}
                   </div>
