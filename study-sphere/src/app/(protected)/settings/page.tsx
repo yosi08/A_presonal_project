@@ -317,12 +317,6 @@ export default function Settings() {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                      <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-1">{t('googleAccount')}</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{t('googleAccountDesc')}</p>
-                      <p className="text-sm text-indigo-600 dark:text-indigo-400">{t('manageGoogleSecurity')}</p>
-                    </div>
-
                     <div className="p-4 bg-red-50 dark:bg-red-950 rounded-lg border border-red-100 dark:border-red-900">
                       <h3 className="font-medium text-red-900 dark:text-red-200 mb-1">{t('deleteAccount')}</h3>
                       <p className="text-sm text-red-600 dark:text-red-400 mb-3">
