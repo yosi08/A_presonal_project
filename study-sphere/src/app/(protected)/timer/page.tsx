@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Play, Pause, RotateCcw, Settings, Coffee, BookOpen } from 'lucide-react'
+import { Play, Pause, RotateCcw, Settings, Coffee, BookOpen, Plus, X, Bookmark } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 
 export default function Timer() {
-  const { t } = useApp()
+  const { t, timerPresets, setTimerPresets } = useApp()
   const [studyMinutes, setStudyMinutes] = useState(50)
   const [breakMinutes, setBreakMinutes] = useState(10)
   const [totalCycles, setTotalCycles] = useState(4)
@@ -15,6 +15,9 @@ export default function Timer() {
   const [isRunning, setIsRunning] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [completedCycles, setCompletedCycles] = useState(0)
+  const [activePresetId, setActivePresetId] = useState(null)
+  const [showPresetSave, setShowPresetSave] = useState(false)
+  const [presetName, setPresetName] = useState('')
   const intervalRef = useRef(null)
 
   useEffect(() => {
@@ -73,6 +76,39 @@ export default function Timer() {
     setShowSettings(false)
   }
 
+  const applyPreset = (preset) => {
+    setStudyMinutes(preset.studyMinutes)
+    setBreakMinutes(preset.breakMinutes)
+    setTotalCycles(preset.totalCycles)
+    setIsRunning(false)
+    clearInterval(intervalRef.current)
+    setCurrentCycle(1)
+    setCompletedCycles(0)
+    setIsStudyTime(true)
+    setTimeLeft(preset.studyMinutes * 60)
+    setActivePresetId(preset.id)
+  }
+
+  const savePreset = () => {
+    if (!presetName.trim()) return
+    const newPreset = {
+      id: String(Date.now()),
+      name: presetName.trim(),
+      studyMinutes,
+      breakMinutes,
+      totalCycles,
+    }
+    setTimerPresets([...timerPresets, newPreset])
+    setPresetName('')
+    setShowPresetSave(false)
+    setActivePresetId(newPreset.id)
+  }
+
+  const deletePreset = (id) => {
+    setTimerPresets(timerPresets.filter((p) => p.id !== id))
+    if (activePresetId === id) setActivePresetId(null)
+  }
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -107,6 +143,52 @@ export default function Timer() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-4">
+        {/* Presets */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Bookmark className="w-5 h-5 text-blue-600" />
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('presets')}</h3>
+            </div>
+            <button
+              onClick={() => setShowPresetSave(true)}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              {t('addPreset')}
+            </button>
+          </div>
+
+          {timerPresets.length === 0 ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500">{t('noPresets')}</p>
+          ) : (
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {timerPresets.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() => applyPreset(preset)}
+                  className={`relative group flex-shrink-0 px-4 py-3 rounded-lg border-2 transition-all text-left ${
+                    activePresetId === preset.id
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500'
+                  }`}
+                >
+                  <button
+                    onClick={(e) => { e.stopPropagation(); deletePreset(preset.id) }}
+                    className="absolute -top-2 -right-2 hidden group-hover:flex w-5 h-5 items-center justify-center bg-red-500 text-white rounded-full"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                  <div className="font-medium text-sm text-gray-900 dark:text-gray-100">{preset.name}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {preset.studyMinutes}{t('minutes')}/{preset.breakMinutes}{t('minutes')} · {preset.totalCycles}{t('cycle')}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Main Timer Card */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-6">
           {/* Status */}
@@ -289,6 +371,59 @@ export default function Timer() {
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 {t('apply')}
+              </button>
+            </div>
+            <button
+              onClick={() => { setShowSettings(false); setShowPresetSave(true) }}
+              className="w-full mt-3 px-4 py-2 flex items-center justify-center gap-2 border border-blue-300 dark:border-blue-600 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
+            >
+              <Bookmark className="w-4 h-4" />
+              {t('saveAsPreset')}
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Preset Save Modal */}
+      {showPresetSave && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/50" onClick={() => { setShowPresetSave(false); setPresetName('') }} />
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('saveAsPreset')}</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('presetName')}
+                </label>
+                <input
+                  type="text"
+                  value={presetName}
+                  onChange={(e) => setPresetName(e.target.value)}
+                  placeholder={t('presetNamePlaceholder')}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                <div>{t('studyDuration')}: {studyMinutes}{t('minutes')}</div>
+                <div>{t('breakDuration')}: {breakMinutes}{t('minutes')}</div>
+                <div>{t('numberOfCycles')}: {totalCycles}</div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => { setShowPresetSave(false); setPresetName('') }}
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={savePreset}
+                disabled={!presetName.trim()}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {t('save')}
               </button>
             </div>
           </div>

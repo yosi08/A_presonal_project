@@ -4,6 +4,14 @@ import { createContext, useContext, useState, useEffect, useRef, useCallback, Re
 import en from '@/locales/en/translation.json'
 import ko from '@/locales/ko/translation.json'
 
+interface TimerPreset {
+  id: string
+  name: string
+  studyMinutes: number
+  breakMinutes: number
+  totalCycles: number
+}
+
 interface AppContextType {
   language: string
   setLanguage: (lang: string) => void
@@ -14,6 +22,8 @@ interface AppContextType {
   setNotes: (notes: any[]) => void
   settings: any
   setSettings: (settings: any) => void
+  timerPresets: TimerPreset[]
+  setTimerPresets: (presets: TimerPreset[]) => void
   requestNotificationPermission: () => Promise<NotificationPermission | null>
   notificationPermission: string
 }
@@ -71,6 +81,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [sessions, setSessions] = useState(defaultSessions)
   const [notes, setNotes] = useState(defaultNotes)
   const [settings, setSettings] = useState(defaultSettings)
+  const [timerPresets, setTimerPresets] = useState<TimerPreset[]>([])
   const [isHydrated, setIsHydrated] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState('default')
   const notifiedSessionsRef = useRef(new Set<string>())
@@ -82,11 +93,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const savedSessions = localStorage.getItem('sessions')
       const savedNotes = localStorage.getItem('notes')
       const savedSettings = localStorage.getItem('settings')
+      const savedTimerPresets = localStorage.getItem('timerPresets')
 
       if (savedLanguage) setLanguage(savedLanguage)
       if (savedSessions) setSessions(JSON.parse(savedSessions))
       if (savedNotes) setNotes(JSON.parse(savedNotes))
       if (savedSettings) setSettings(JSON.parse(savedSettings))
+      if (savedTimerPresets) setTimerPresets(JSON.parse(savedTimerPresets))
 
       if ('Notification' in window) {
         setNotificationPermission(Notification.permission)
@@ -120,6 +133,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('settings', JSON.stringify(settings))
     }
   }, [settings, isHydrated])
+
+  useEffect(() => {
+    if (isHydrated && typeof window !== 'undefined') {
+      localStorage.setItem('timerPresets', JSON.stringify(timerPresets))
+    }
+  }, [timerPresets, isHydrated])
 
   // Apply dark mode class to <html>
   useEffect(() => {
@@ -315,6 +334,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setNotes,
     settings,
     setSettings,
+    timerPresets,
+    setTimerPresets,
     requestNotificationPermission,
     notificationPermission,
   }

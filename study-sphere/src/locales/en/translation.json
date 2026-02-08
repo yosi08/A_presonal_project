@@ -183,6 +183,13 @@
     "breakDuration": "Break Duration",
     "numberOfCycles": "Number of Cycles",
     "minutes": "minutes",
-    "apply": "Apply"
+    "apply": "Apply",
+    "presets": "Presets",
+    "saveAsPreset": "Save as Preset",
+    "presetName": "Name",
+    "presetNamePlaceholder": "e.g., Math Study",
+    "deletePreset": "Delete Preset",
+    "noPresets": "No saved presets",
+    "addPreset": "Add Preset"
   }
 }
