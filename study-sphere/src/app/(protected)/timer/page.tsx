@@ -162,12 +162,12 @@ export default function Timer() {
           {timerPresets.length === 0 ? (
             <p className="text-sm text-gray-400 dark:text-gray-500">{t('noPresets')}</p>
           ) : (
-            <div className="flex gap-3 overflow-x-auto pb-2">
+            <div className="flex gap-3 overflow-x-auto pt-3 pb-2 -mt-1">
               {timerPresets.map((preset) => (
                 <button
                   key={preset.id}
                   onClick={() => applyPreset(preset)}
-                  className={`relative group flex-shrink-0 px-4 py-3 rounded-lg border-2 transition-all text-left ${
+                  className={`relative group flex-shrink-0 px-4 py-3 rounded-lg border-2 transition-all text-left overflow-visible ${
                     activePresetId === preset.id
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
                       : 'border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500'
@@ -324,8 +324,9 @@ export default function Timer() {
                   type="number"
                   min="1"
                   max="120"
-                  value={studyMinutes}
-                  onChange={(e) => setStudyMinutes(Math.max(1, parseInt(e.target.value) || 1))}
+                  value={studyMinutes === 0 ? '' : studyMinutes}
+                  onChange={(e) => setStudyMinutes(e.target.value === '' ? 0 : Math.min(120, parseInt(e.target.value) || 0))}
+                  onBlur={() => { if (studyMinutes < 1) setStudyMinutes(1) }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -338,8 +339,9 @@ export default function Timer() {
                   type="number"
                   min="1"
                   max="60"
-                  value={breakMinutes}
-                  onChange={(e) => setBreakMinutes(Math.max(1, parseInt(e.target.value) || 1))}
+                  value={breakMinutes === 0 ? '' : breakMinutes}
+                  onChange={(e) => setBreakMinutes(e.target.value === '' ? 0 : Math.min(60, parseInt(e.target.value) || 0))}
+                  onBlur={() => { if (breakMinutes < 1) setBreakMinutes(1) }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -352,8 +354,9 @@ export default function Timer() {
                   type="number"
                   min="1"
                   max="10"
-                  value={totalCycles}
-                  onChange={(e) => setTotalCycles(Math.max(1, parseInt(e.target.value) || 1))}
+                  value={totalCycles === 0 ? '' : totalCycles}
+                  onChange={(e) => setTotalCycles(e.target.value === '' ? 0 : Math.min(10, parseInt(e.target.value) || 0))}
+                  onBlur={() => { if (totalCycles < 1) setTotalCycles(1) }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
