@@ -184,12 +184,12 @@
     "numberOfCycles": "Number of Cycles",
     "minutes": "minutes",
     "apply": "Apply",
-    "presets": "Presets",
-    "saveAsPreset": "Save as Preset",
+    "presets": "Favorites",
+    "saveAsPreset": "Save as Favorite",
     "presetName": "Name",
     "presetNamePlaceholder": "e.g., Math Study",
-    "deletePreset": "Delete Preset",
-    "noPresets": "No saved presets",
-    "addPreset": "Add Preset"
+    "deletePreset": "Delete Favorite",
+    "noPresets": "No saved favorites",
+    "addPreset": "Add Favorite"
   }
 }
