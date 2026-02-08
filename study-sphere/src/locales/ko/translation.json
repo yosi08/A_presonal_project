@@ -28,7 +28,7 @@
     "noSessionsScheduled": "예정된 세션 없음",
     "addASession": "세션 추가하기",
     "addStudySession": "학습 세션 추가",
-    "title": "날짜",
+    "title": "제목",
     "startTime": "시작 시간",
     "endTime": "종료 시간",
     "subject": "과목",
@@ -59,7 +59,7 @@
     "summarySection": "요약",
     "summaryDescription": "핵심 내용을 2-3문장으로 요약",
     "summaryPlaceholder": "학습한 내용의 핵심을 요약하세요",
-    "noteTitlePlaceholder": "연도, 월, 일",
+    "noteTitlePlaceholder": "노트 제목을 입력하세요",
     "noCues": "단서가 없습니다",
     "noNotes": "노트가 없습니다",
     "noSummary": "요약이 없습니다"

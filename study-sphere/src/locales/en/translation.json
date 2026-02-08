@@ -28,7 +28,7 @@
     "noSessionsScheduled": "No sessions scheduled",
     "addASession": "Add a session",
     "addStudySession": "Add Study Session",
-    "title": "Date",
+    "title": "Title",
     "startTime": "Start Time",
     "endTime": "End Time",
     "subject": "Subject",
@@ -59,7 +59,7 @@
     "summarySection": "Summary",
     "summaryDescription": "Summarize the key points in 2-3 sentences",
     "summaryPlaceholder": "Summarize the main takeaways",
-    "noteTitlePlaceholder": "Year, Month, Day",
+    "noteTitlePlaceholder": "Enter note title",
     "noCues": "No cues added",
     "noNotes": "No notes added",
     "noSummary": "No summary added"
