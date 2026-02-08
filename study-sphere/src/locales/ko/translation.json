@@ -34,7 +34,8 @@
     "subject": "과목",
     "cancel": "취소",
     "delete": "삭제",
-    "edit": "수정"
+    "edit": "수정",
+    "sessionTitlePlaceholder": "학습 세션 제목"
   },
   "notes": {
     "organizeNotes": "학습 자료를 정리하세요",

@@ -330,7 +330,7 @@ export default function Calendar() {
                   value={newSession.title}
                   onChange={(e) => setNewSession({ ...newSession, title: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Study session title"
+                  placeholder={t('sessionTitlePlaceholder')}
                 />
               </div>
 

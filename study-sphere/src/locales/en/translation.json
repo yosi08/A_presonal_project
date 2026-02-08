@@ -34,7 +34,8 @@
     "subject": "Subject",
     "cancel": "Cancel",
     "delete": "Delete",
-    "edit": "Edit"
+    "edit": "Edit",
+    "sessionTitlePlaceholder": "Study session title"
   },
   "notes": {
     "organizeNotes": "Organize your study materials",
