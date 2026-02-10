@@ -27,6 +27,7 @@ import Svg, { Circle } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useTheme } from '../theme/ThemeContext';
+import { boxShadow } from '../utils/styles';
 import { useApp } from '../context/AppContext';
 
 export default function TimerScreen() {
@@ -510,11 +511,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    ...boxShadow('#000', 0, 2, 0.08, 8, 3),
   },
   cardTitle: { fontSize: 16, fontWeight: '600' },
   presetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
