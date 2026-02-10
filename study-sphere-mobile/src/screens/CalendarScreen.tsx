@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
+import { boxShadow } from '../utils/styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Calendar as RNCalendar } from 'react-native-calendars';
@@ -406,11 +407,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    ...boxShadow('#000', 0, 2, 0.08, 8, 3),
   },
   dateHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   dateText: { fontSize: 16, fontWeight: '600' },
@@ -445,11 +442,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2563EB',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 6,
+    ...boxShadow('#2563EB', 0, 4, 0.35, 8, 6),
   },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { width: '90%', borderRadius: 16, padding: 24 },

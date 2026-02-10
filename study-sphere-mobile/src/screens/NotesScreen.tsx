@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
+import { boxShadow } from '../utils/styles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Search, Plus, BookOpen } from 'lucide-react-native';
@@ -448,17 +449,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     borderWidth: 1,
     overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    ...boxShadow('#000', 0, 1, 0.08, 4, 2),
   },
   colorBar: {
     height: 3,
@@ -551,16 +542,6 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#2563EB',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.35,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
+    ...boxShadow('#2563EB', 0, 4, 0.35, 8, 6),
   },
 });

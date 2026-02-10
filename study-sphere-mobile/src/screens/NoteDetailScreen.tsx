@@ -13,6 +13,7 @@ import { ArrowLeft, Edit3, Trash2, Check, X } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeContext';
 import { useApp } from '../context/AppContext';
+import { boxShadow } from '../utils/styles';
 import { SUBJECTS, Note } from '../types';
 
 const getSubjectColor = (subject: string): string => {
@@ -354,11 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
-    shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 4,
+    ...boxShadow('#2563EB', 0, 4, 0.3, 6, 4),
   },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   // View Mode

@@ -25,6 +25,7 @@ import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { useTheme } from '../theme/ThemeContext';
 import { getSessionColor, Note } from '../types';
+import { boxShadow } from '../utils/styles';
 
 const { width } = Dimensions.get('window');
 
@@ -477,11 +478,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 18,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    ...boxShadow('#000', 0, 2, 0.06, 8, 3),
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -529,11 +526,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 10,
-    shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    ...boxShadow('#2563EB', 0, 2, 0.3, 4, 3),
   },
   addButtonText: {
     color: '#FFFFFF',

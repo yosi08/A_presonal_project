@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Check, LogOut, Trash2, Sun, Moon } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { boxShadow } from '../utils/styles';
 import { useTheme } from '../theme/ThemeContext';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -269,11 +270,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    ...boxShadow('#000', 0, 2, 0.08, 8, 3),
   },
   sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 4 },
   sectionDesc: { fontSize: 13, marginBottom: 16 },

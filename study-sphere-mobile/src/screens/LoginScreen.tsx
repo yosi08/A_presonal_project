@@ -13,6 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BookOpen, Loader2 } from 'lucide-react-native';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import { boxShadow } from '../utils/styles';
 import { useTheme } from '../theme/ThemeContext';
 
 const { width, height } = Dimensions.get('window');
@@ -131,11 +132,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.95)',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    ...boxShadow('#000', 0, 4, 0.15, 12, 8),
   },
   appName: {
     fontSize: 36,
@@ -158,11 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingTop: 36,
     paddingBottom: 48,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 12,
+    ...boxShadow('#000', 0, -4, 0.1, 16, 12),
   },
   loginTitle: {
     fontSize: 26,

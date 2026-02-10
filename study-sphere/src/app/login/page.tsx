@@ -12,3 +12,5 @@ export default async function LoginPage() {
 
   return <LoginForm />
 }
+
+// The actual translations are located in study-sphere-mobile/src/locales/en/translation.json and study-sphere-mobile/src/locales/ko/translation.json
