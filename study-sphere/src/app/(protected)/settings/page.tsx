@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { User, Bell, Palette, Shield, Save, Check, Globe, Camera } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import { deleteUserData } from '@/lib/firestore'
 
 export default function Settings() {
   const { data: session } = useSession()
@@ -30,10 +31,18 @@ export default function Settings() {
   const handleDeleteAccount = async () => {
     setDeleting(true)
     try {
+      // Delete Firestore data
+      const userId = (session?.user as any)?.id
+      if (userId) {
+        await deleteUserData(userId)
+      }
+
+      // Clear localStorage
       localStorage.removeItem('sessions')
       localStorage.removeItem('notes')
       localStorage.removeItem('settings')
       localStorage.removeItem('language')
+      localStorage.removeItem('timerPresets')
       localStorage.removeItem('lastEmailDate')
       localStorage.removeItem('lastWeeklyReportDate')
       await signOut({ callbackUrl: '/login' })

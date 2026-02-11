@@ -1,8 +1,15 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react'
+import { useSession } from 'next-auth/react'
 import en from '@/locales/en/translation.json'
 import ko from '@/locales/ko/translation.json'
+import {
+  loadUserData,
+  initializeUserData,
+  updateUserField,
+  saveAllUserData,
+} from '@/lib/firestore'
 
 interface TimerPreset {
   id: string
@@ -26,6 +33,8 @@ interface AppContextType {
   setTimerPresets: (presets: TimerPreset[]) => void
   requestNotificationPermission: () => Promise<NotificationPermission | null>
   notificationPermission: string
+  isLoading: boolean
+  isSyncing: boolean
 }
 
 const AppContext = createContext<AppContextType | null>(null)
@@ -33,7 +42,7 @@ const AppContext = createContext<AppContextType | null>(null)
 const translations = { en, ko }
 
 // Helper function for nested translations
-const getNestedValue = (obj, path) => {
+const getNestedValue = (obj: any, path: string) => {
   const keys = path.split('.')
   let result = obj
   for (const key of keys) {
@@ -47,10 +56,8 @@ const getNestedValue = (obj, path) => {
 }
 
 // Default values
-const defaultSessions = []
-
-const defaultNotes = []
-
+const defaultSessions: any[] = []
+const defaultNotes: any[] = []
 const defaultSettings = {
   theme: 'light',
   notifications: {
@@ -77,16 +84,24 @@ function getWeekMondayStr() {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState('ko')
-  const [sessions, setSessions] = useState(defaultSessions)
-  const [notes, setNotes] = useState(defaultNotes)
-  const [settings, setSettings] = useState(defaultSettings)
-  const [timerPresets, setTimerPresets] = useState<TimerPreset[]>([])
+  const { data: session, status } = useSession()
+
+  const [language, setLanguageState] = useState('ko')
+  const [sessions, setSessionsState] = useState(defaultSessions)
+  const [notes, setNotesState] = useState(defaultNotes)
+  const [settings, setSettingsState] = useState(defaultSettings)
+  const [timerPresets, setTimerPresetsState] = useState<TimerPreset[]>([])
   const [isHydrated, setIsHydrated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState('default')
   const notifiedSessionsRef = useRef(new Set<string>())
 
-  // Initialize from localStorage on client (after hydration)
+  const userId = (session?.user as any)?.id as string | undefined
+  const isInitialLoad = useRef(true)
+  const syncTimers = useRef<Record<string, NodeJS.Timeout>>({})
+
+  // Step 1: Load from localStorage immediately (fast hydration)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedLanguage = localStorage.getItem('language')
@@ -95,11 +110,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const savedSettings = localStorage.getItem('settings')
       const savedTimerPresets = localStorage.getItem('timerPresets')
 
-      if (savedLanguage) setLanguage(savedLanguage)
-      if (savedSessions) setSessions(JSON.parse(savedSessions))
-      if (savedNotes) setNotes(JSON.parse(savedNotes))
-      if (savedSettings) setSettings(JSON.parse(savedSettings))
-      if (savedTimerPresets) setTimerPresets(JSON.parse(savedTimerPresets))
+      if (savedLanguage) setLanguageState(savedLanguage)
+      if (savedSessions) setSessionsState(JSON.parse(savedSessions))
+      if (savedNotes) setNotesState(JSON.parse(savedNotes))
+      if (savedSettings) setSettingsState(JSON.parse(savedSettings))
+      if (savedTimerPresets) setTimerPresetsState(JSON.parse(savedTimerPresets))
 
       if ('Notification' in window) {
         setNotificationPermission(Notification.permission)
@@ -109,36 +124,158 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Persist to localStorage
+  // Step 2: Load from Firestore when user session is available
   useEffect(() => {
-    if (isHydrated && typeof window !== 'undefined') {
-      localStorage.setItem('language', language)
+    if (!isHydrated || !userId || status !== 'authenticated') {
+      if (status === 'unauthenticated') {
+        setIsLoading(false)
+      }
+      return
     }
-  }, [language, isHydrated])
 
-  useEffect(() => {
-    if (isHydrated && typeof window !== 'undefined') {
-      localStorage.setItem('sessions', JSON.stringify(sessions))
-    }
-  }, [sessions, isHydrated])
+    let cancelled = false
 
-  useEffect(() => {
-    if (isHydrated && typeof window !== 'undefined') {
-      localStorage.setItem('notes', JSON.stringify(notes))
-    }
-  }, [notes, isHydrated])
+    const loadFromFirestore = async () => {
+      setIsLoading(true)
+      try {
+        let userData = await loadUserData(userId)
 
-  useEffect(() => {
-    if (isHydrated && typeof window !== 'undefined') {
-      localStorage.setItem('settings', JSON.stringify(settings))
-    }
-  }, [settings, isHydrated])
+        if (cancelled) return
 
-  useEffect(() => {
-    if (isHydrated && typeof window !== 'undefined') {
-      localStorage.setItem('timerPresets', JSON.stringify(timerPresets))
+        if (!userData) {
+          // First-time user: check if localStorage has data to migrate
+          const hasLocalData =
+            localStorage.getItem('sessions') ||
+            localStorage.getItem('notes') ||
+            localStorage.getItem('timerPresets')
+
+          if (hasLocalData) {
+            const migrationData = {
+              sessions,
+              notes,
+              timerPresets,
+              settings,
+              language,
+            }
+            await saveAllUserData(userId, migrationData)
+            userData = migrationData
+          } else {
+            userData = await initializeUserData(userId)
+          }
+        }
+
+        if (cancelled) return
+
+        // Firestore is the source of truth
+        setSessionsState(userData.sessions)
+        setNotesState(userData.notes)
+        setTimerPresetsState(userData.timerPresets)
+        setSettingsState(userData.settings)
+        setLanguageState(userData.language)
+
+        // Update localStorage cache
+        localStorage.setItem('sessions', JSON.stringify(userData.sessions))
+        localStorage.setItem('notes', JSON.stringify(userData.notes))
+        localStorage.setItem('timerPresets', JSON.stringify(userData.timerPresets))
+        localStorage.setItem('settings', JSON.stringify(userData.settings))
+        localStorage.setItem('language', userData.language)
+      } catch (error) {
+        console.error('Failed to load from Firestore, using localStorage data:', error)
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false)
+          setTimeout(() => {
+            isInitialLoad.current = false
+          }, 500)
+        }
+      }
     }
-  }, [timerPresets, isHydrated])
+
+    loadFromFirestore()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isHydrated, userId, status])
+
+  // Debounced Firestore sync helper
+  const syncToFirestore = useCallback(
+    (field: string, value: any) => {
+      if (!userId || isInitialLoad.current) return
+
+      if (syncTimers.current[field]) {
+        clearTimeout(syncTimers.current[field])
+      }
+
+      syncTimers.current[field] = setTimeout(async () => {
+        try {
+          setIsSyncing(true)
+          await updateUserField(userId, field as any, value)
+        } catch (error) {
+          console.error(`Failed to sync ${field} to Firestore:`, error)
+        } finally {
+          setIsSyncing(false)
+        }
+      }, 500)
+    },
+    [userId]
+  )
+
+  // Wrapped setters: localStorage + Firestore
+  const setLanguage = useCallback(
+    (lang: string) => {
+      setLanguageState(lang)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('language', lang)
+      }
+      syncToFirestore('language', lang)
+    },
+    [syncToFirestore]
+  )
+
+  const setSessions = useCallback(
+    (newSessions: any[]) => {
+      setSessionsState(newSessions)
+      if (isHydrated && typeof window !== 'undefined') {
+        localStorage.setItem('sessions', JSON.stringify(newSessions))
+      }
+      syncToFirestore('sessions', newSessions)
+    },
+    [isHydrated, syncToFirestore]
+  )
+
+  const setNotes = useCallback(
+    (newNotes: any[]) => {
+      setNotesState(newNotes)
+      if (isHydrated && typeof window !== 'undefined') {
+        localStorage.setItem('notes', JSON.stringify(newNotes))
+      }
+      syncToFirestore('notes', newNotes)
+    },
+    [isHydrated, syncToFirestore]
+  )
+
+  const setSettings = useCallback(
+    (newSettings: any) => {
+      setSettingsState(newSettings)
+      if (isHydrated && typeof window !== 'undefined') {
+        localStorage.setItem('settings', JSON.stringify(newSettings))
+      }
+      syncToFirestore('settings', newSettings)
+    },
+    [isHydrated, syncToFirestore]
+  )
+
+  const setTimerPresets = useCallback(
+    (newPresets: TimerPreset[]) => {
+      setTimerPresetsState(newPresets)
+      if (isHydrated && typeof window !== 'undefined') {
+        localStorage.setItem('timerPresets', JSON.stringify(newPresets))
+      }
+      syncToFirestore('timerPresets', newPresets)
+    },
+    [isHydrated, syncToFirestore]
+  )
 
   // Apply dark mode class to <html>
   useEffect(() => {
@@ -305,8 +442,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [isHydrated, settings.notifications.weeklyReport, sessions, notes, language])
 
   // Translation function
-  const t = (key) => {
-    const langData = translations[language]
+  const t = (key: string) => {
+    const langData = translations[language as keyof typeof translations]
     if (!langData) return key
 
     // Handle nested paths like 'category.key'
@@ -316,13 +453,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     // Search across all categories for flat keys
     for (const category of Object.values(langData)) {
-      if (typeof category === 'object' && key in category) {
-        return category[key]
+      if (typeof category === 'object' && key in (category as any)) {
+        return (category as any)[key]
       }
     }
 
     return key
   }
+
+  // Cleanup debounce timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(syncTimers.current).forEach(clearTimeout)
+    }
+  }, [])
 
   const value = {
     language,
@@ -338,6 +482,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTimerPresets,
     requestNotificationPermission,
     notificationPermission,
+    isLoading,
+    isSyncing,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
