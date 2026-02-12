@@ -372,36 +372,34 @@ export default function Settings() {
                   </div>
                 </div>
               )}
+
+              {/* Save Bar */}
+              {hasChanges && (
+                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {t('unsavedChanges') || '저장되지 않은 변경 사항이 있습니다.'}
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleDiscard}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      {t('discard') || '취소'}
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    >
+                      <Save className="w-4 h-4" />
+                      {saved ? (t('saved') || '저장됨!') : (t('saveChanges') || '저장하기')}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Save Bar */}
-      {hasChanges && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              {t('unsavedChanges') || '저장되지 않은 변경 사항이 있습니다.'}
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={handleDiscard}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                {t('discard') || '취소'}
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                <Save className="w-4 h-4" />
-                {saved ? (t('saved') || '저장됨!') : (t('saveChanges') || '저장하기')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Delete Account Confirmation Modal */}
       {showDeleteConfirm && (
