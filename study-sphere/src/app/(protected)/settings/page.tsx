@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { User, Bell, Palette, Shield, Save, Check, Globe, Camera } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
@@ -14,18 +14,32 @@ export default function Settings() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
+  // Draft state for unsaved changes
+  const [draftSettings, setDraftSettings] = useState(settings)
+  const [draftLanguage, setDraftLanguage] = useState(language)
+
+  // Sync draft when context values change externally
+  useEffect(() => { setDraftSettings(settings) }, [settings])
+  useEffect(() => { setDraftLanguage(language) }, [language])
+
+  const hasChanges = useMemo(() => {
+    return JSON.stringify(draftSettings) !== JSON.stringify(settings) || draftLanguage !== language
+  }, [draftSettings, draftLanguage, settings, language])
+
   const user = session?.user || { name: 'User', email: '' }
 
-  const [profile, setProfile] = useState({
-    name: user.name || '',
-    email: user.email || '',
-    bio: '',
-  })
   const fileInputRef = useRef(null)
 
   const handleSave = () => {
+    setSettings(draftSettings)
+    setLanguage(draftLanguage)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleDiscard = () => {
+    setDraftSettings(settings)
+    setDraftLanguage(language)
   }
 
   const handleDeleteAccount = async () => {
@@ -52,14 +66,14 @@ export default function Settings() {
   }
 
   const handleThemeChange = (theme) => {
-    setSettings({
-      ...settings,
+    setDraftSettings({
+      ...draftSettings,
       theme,
     })
   }
 
   const handleNotificationChange = async (key) => {
-    const newValue = !settings.notifications[key]
+    const newValue = !draftSettings.notifications[key]
 
     // Request browser notification permission when enabling studyReminders
     if (key === 'studyReminders' && newValue) {
@@ -67,10 +81,10 @@ export default function Settings() {
       if (permission === 'denied') return
     }
 
-    setSettings({
-      ...settings,
+    setDraftSettings({
+      ...draftSettings,
       notifications: {
-        ...settings.notifications,
+        ...draftSettings.notifications,
         [key]: newValue,
       },
     })
@@ -198,12 +212,12 @@ export default function Settings() {
                       <button
                         onClick={() => handleNotificationChange('emailReminders')}
                         className={`relative w-12 h-6 rounded-full transition-colors ${
-                          settings.notifications.emailReminders ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                          draftSettings.notifications.emailReminders ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                         }`}
                       >
                         <span
                           className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                            settings.notifications.emailReminders ? 'left-7' : 'left-1'
+                            draftSettings.notifications.emailReminders ? 'left-7' : 'left-1'
                           }`}
                         />
                       </button>
@@ -218,20 +232,20 @@ export default function Settings() {
                         <button
                           onClick={() => handleNotificationChange('studyReminders')}
                           className={`relative w-12 h-6 rounded-full transition-colors ${
-                            settings.notifications.studyReminders ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                            draftSettings.notifications.studyReminders ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                           }`}
                         >
                           <span
                             className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                              settings.notifications.studyReminders ? 'left-7' : 'left-1'
+                              draftSettings.notifications.studyReminders ? 'left-7' : 'left-1'
                             }`}
                           />
                         </button>
                       </div>
-                      {settings.notifications.studyReminders && notificationPermission === 'denied' && (
+                      {draftSettings.notifications.studyReminders && notificationPermission === 'denied' && (
                         <p className="text-sm text-red-500 mt-2">{t('notificationPermissionDenied')}</p>
                       )}
-                      {settings.notifications.studyReminders && notificationPermission === 'granted' && (
+                      {draftSettings.notifications.studyReminders && notificationPermission === 'granted' && (
                         <p className="text-sm text-blue-600 dark:text-blue-400 mt-2">{t('notificationPermissionGranted')}</p>
                       )}
                     </div>
@@ -244,12 +258,12 @@ export default function Settings() {
                       <button
                         onClick={() => handleNotificationChange('weeklyReport')}
                         className={`relative w-12 h-6 rounded-full transition-colors ${
-                          settings.notifications.weeklyReport ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                          draftSettings.notifications.weeklyReport ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
                         }`}
                       >
                         <span
                           className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                            settings.notifications.weeklyReport ? 'left-7' : 'left-1'
+                            draftSettings.notifications.weeklyReport ? 'left-7' : 'left-1'
                           }`}
                         />
                       </button>
@@ -272,7 +286,7 @@ export default function Settings() {
                       <button
                         onClick={() => handleThemeChange('light')}
                         className={`p-4 rounded-lg border-2 transition-colors ${
-                          settings.theme === 'light'
+                          draftSettings.theme === 'light'
                             ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
                             : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
@@ -283,7 +297,7 @@ export default function Settings() {
                       <button
                         onClick={() => handleThemeChange('dark')}
                         className={`p-4 rounded-lg border-2 transition-colors ${
-                          settings.theme === 'dark'
+                          draftSettings.theme === 'dark'
                             ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
                             : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
@@ -309,9 +323,9 @@ export default function Settings() {
                     {languages.map((lang) => (
                       <button
                         key={lang.code}
-                        onClick={() => setLanguage(lang.code)}
+                        onClick={() => setDraftLanguage(lang.code)}
                         className={`w-full flex items-center gap-4 p-4 rounded-lg border-2 transition-colors ${
-                          language === lang.code
+                          draftLanguage === lang.code
                             ? 'border-blue-600 bg-blue-50 dark:bg-blue-950'
                             : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
@@ -323,7 +337,7 @@ export default function Settings() {
                             {lang.code === 'ko' ? '한국어로 앱 사용하기' : 'Use the app in English'}
                           </p>
                         </div>
-                        {language === lang.code && (
+                        {draftLanguage === lang.code && (
                           <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
                             <Check className="w-4 h-4 text-white" />
                           </div>
@@ -362,6 +376,32 @@ export default function Settings() {
           </div>
         </div>
       </div>
+
+      {/* Save Bar */}
+      {hasChanges && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {t('unsavedChanges') || '저장되지 않은 변경 사항이 있습니다.'}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleDiscard}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                {t('discard') || '취소'}
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <Save className="w-4 h-4" />
+                {saved ? (t('saved') || '저장됨!') : (t('saveChanges') || '저장하기')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Account Confirmation Modal */}
       {showDeleteConfirm && (
