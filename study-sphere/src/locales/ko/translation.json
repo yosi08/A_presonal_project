@@ -112,6 +112,9 @@
     "deleting": "삭제 중...",
     "saved": "저장됨!",
     "save": "변경사항 저장",
+    "unsavedChanges": "저장되지 않은 변경 사항이 있습니다.",
+    "discard": "취소",
+    "saveChanges": "변경사항 저장",
     "languageSettings": "언어 설정",
     "selectLanguage": "선호하는 언어를 선택하세요"
   },

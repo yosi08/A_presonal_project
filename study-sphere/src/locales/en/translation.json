@@ -112,6 +112,9 @@
     "deleting": "Deleting...",
     "saved": "Saved!",
     "save": "Save Changes",
+    "unsavedChanges": "You have unsaved changes.",
+    "discard": "Discard",
+    "saveChanges": "Save Changes",
     "languageSettings": "Language Settings",
     "selectLanguage": "Select your preferred language"
   },
