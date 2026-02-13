@@ -289,7 +289,7 @@ export default function HomeScreen() {
                       style={[
                         styles.weekDayDateBox,
                         day.isToday
-                          ? { backgroundColor: '#2563EB' }
+                          ? { backgroundColor: '#60A5FA' }
                           : { backgroundColor: c.surfaceSecondary },
                       ]}
                     >
