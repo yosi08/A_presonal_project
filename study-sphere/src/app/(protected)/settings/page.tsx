@@ -432,3 +432,5 @@ export default function Settings() {
     </div>
   )
 }
+
+//할게 오지게 많으니깐 그만 하고 싶어지는 사람의 심리를 어떻게 꺽을 것 인지에 대하여 논의
