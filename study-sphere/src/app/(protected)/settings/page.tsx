@@ -146,7 +146,6 @@ export default function Settings() {
                 <div className="space-y-6">
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">{t('profileSettings')}</h2>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">{t('updatePersonalInfo')}</p>
                   </div>
 
                   <div className="flex items-center gap-4">
@@ -433,4 +432,3 @@ export default function Settings() {
   )
 }
 
-//할게 오지게 많으니깐 그만 하고 싶어지는 사람의 심리를 어떻게 꺽을 것 인지에 대하여 논의
