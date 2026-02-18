@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Plus, Search, X, Edit3, Trash2, BookOpen } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import { filterNotes as filterNotesUtil } from '@/lib/utils/notes'
 
 const SUBJECTS = [
   { name: 'Mathematics', color: 'rgb(99, 102, 241)' },
@@ -14,7 +15,7 @@ const SUBJECTS = [
 ]
 
 export default function Notes() {
-  const { t, notes, setNotes } = useApp()
+  const { t, notes, setNotes, loadMoreNotes, hasMoreNotes, isLoadingMore } = useApp()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedSubject, setSelectedSubject] = useState('All')
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -29,12 +30,7 @@ export default function Notes() {
     summary: '',
   })
 
-  const filteredNotes = notes.filter((note) => {
-    const searchContent = `${note.title} ${note.cues || ''} ${note.notes || ''} ${note.summary || ''} ${note.content || ''}`
-    const matchesSearch = searchContent.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesSubject = selectedSubject === 'All' || note.subject === selectedSubject
-    return matchesSearch && matchesSubject
-  })
+  const filteredNotes = filterNotesUtil(notes, searchTerm, selectedSubject)
 
   const getSubjectColor = (subject) => {
     const found = SUBJECTS.find((s) => s.name === subject)
@@ -255,6 +251,19 @@ export default function Notes() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {hasMoreNotes && (
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={loadMoreNotes}
+              disabled={isLoadingMore}
+              className="px-6 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium disabled:opacity-50"
+            >
+              {isLoadingMore ? (t('loading') || '로딩 중...') : (t('loadMore') || '더 보기')}
+            </button>
           </div>
         )}
       </div>

@@ -7,7 +7,7 @@ import { useApp } from '@/context/AppContext'
 
 export default function Home() {
   const { data: session } = useSession()
-  const { t, sessions, notes } = useApp()
+  const { t, sessions, notes, totalNotesCount, totalSessionsCount } = useApp()
 
   const user = session?.user || { name: 'User' }
 
@@ -39,8 +39,8 @@ export default function Home() {
   const stats = [
     { icon: Calendar, labelKey: 'today', value: todaySessions.length.toString() },
     { icon: Clock, labelKey: 'thisWeek', value: `${Math.round(totalHours)}h` },
-    { icon: BookOpen, labelKey: 'notes', value: notes.length.toString() },
-    { icon: TrendingUp, labelKey: 'sessions', value: sessions.length.toString() },
+    { icon: BookOpen, labelKey: 'notes', value: (totalNotesCount || notes.length).toString() },
+    { icon: TrendingUp, labelKey: 'sessions', value: (totalSessionsCount || sessions.length).toString() },
   ]
 
   // Generate week days dynamically

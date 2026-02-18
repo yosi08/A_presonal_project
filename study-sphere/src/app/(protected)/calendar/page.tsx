@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Plus, Clock, X, Trash2, Edit3 } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import { formatDateString } from '@/lib/utils/calendar'
 
 const DAYS = {
   en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -60,14 +61,14 @@ export default function Calendar() {
   }
 
   const getSessionsForDate = (day) => {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    const dateStr = formatDateString(year, month, day)
     return sessions.filter((session) => session.date === dateStr)
   }
 
   const handleAddSession = () => {
     if (!newSession.title) return
 
-    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+    const dateStr = formatDateString(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate())
 
     if (editingSession) {
       setSessions(sessions.map(s =>
@@ -113,7 +114,7 @@ export default function Calendar() {
   }
 
   const selectedDateSessions = sessions.filter(s => {
-    const selDateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+    const selDateStr = formatDateString(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate())
     return s.date === selDateStr
   })
 

@@ -16,10 +16,8 @@ function ThemedApp() {
 
   return (
     <ThemeProvider theme={settings.theme}>
-      <AuthProvider>
-        <RootNavigator />
-        <StatusBar style={settings.theme === 'dark' ? 'light' : 'dark'} />
-      </AuthProvider>
+      <RootNavigator />
+      <StatusBar style={settings.theme === 'dark' ? 'light' : 'dark'} />
     </ThemeProvider>
   );
 }
@@ -28,9 +26,11 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <AppProvider>
-          <ThemedApp />
-        </AppProvider>
+        <AuthProvider>
+          <AppProvider>
+            <ThemedApp />
+          </AppProvider>
+        </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

@@ -2,14 +2,28 @@
 
 import { createContext, useContext, useState, useEffect, useRef, useCallback, ReactNode } from 'react'
 import { useSession } from 'next-auth/react'
+import { DocumentSnapshot } from 'firebase/firestore'
 import en from '@/locales/en/translation.json'
 import ko from '@/locales/ko/translation.json'
 import {
   loadUserData,
   initializeUserData,
-  updateUserField,
   saveAllUserData,
 } from '@/lib/firestore'
+import { migrateUserData } from '@/lib/migrate-data'
+import {
+  loadUserProfile,
+  updateUserProfile,
+  loadSessionsByDateRange,
+  loadAllSessions,
+  addSession as addSessionV2,
+  updateSession as updateSessionV2,
+  deleteSession as deleteSessionV2,
+  loadNotesPaginated,
+  addNote as addNoteV2,
+  updateNote as updateNoteV2,
+  deleteNote as deleteNoteV2,
+} from '@/lib/firestore-v2'
 
 interface TimerPreset {
   id: string
@@ -35,13 +49,28 @@ interface AppContextType {
   notificationPermission: string
   isLoading: boolean
   isSyncing: boolean
+  // Pagination for notes
+  loadMoreNotes: () => Promise<void>
+  hasMoreNotes: boolean
+  isLoadingMore: boolean
+  // Session loading by range
+  loadSessionsForRange: (startDate: string, endDate: string) => Promise<any[]>
+  // Individual CRUD
+  addSession: (session: any) => Promise<void>
+  updateSessionById: (sessionId: string, data: any) => Promise<void>
+  deleteSessionById: (sessionId: string) => Promise<void>
+  addNote: (note: any) => Promise<void>
+  updateNoteById: (noteId: string, data: any) => Promise<void>
+  deleteNoteById: (noteId: string) => Promise<void>
+  // Stats
+  totalNotesCount: number
+  totalSessionsCount: number
 }
 
 const AppContext = createContext<AppContextType | null>(null)
 
 const translations = { en, ko }
 
-// Helper function for nested translations
 const getNestedValue = (obj: any, path: string) => {
   const keys = path.split('.')
   let result = obj
@@ -55,7 +84,6 @@ const getNestedValue = (obj: any, path: string) => {
   return result
 }
 
-// Default values
 const defaultSessions: any[] = []
 const defaultNotes: any[] = []
 const defaultSettings = {
@@ -67,13 +95,11 @@ const defaultSettings = {
   },
 }
 
-// Helper: get today's date string in YYYY-MM-DD format
 function getTodayStr() {
   const today = new Date()
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 }
 
-// Helper: get current week's Monday date string
 function getWeekMondayStr() {
   const now = new Date()
   const day = now.getDay()
@@ -96,6 +122,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [isSyncing, setIsSyncing] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState('default')
   const notifiedSessionsRef = useRef(new Set<string>())
+
+  // Pagination state
+  const [hasMoreNotes, setHasMoreNotes] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [totalNotesCount, setTotalNotesCount] = useState(0)
+  const [totalSessionsCount, setTotalSessionsCount] = useState(0)
+  const lastNoteDocRef = useRef<DocumentSnapshot | null>(null)
+  const isMigratedRef = useRef(false)
 
   const userId = (session?.user as any)?.id as string | undefined
   const isInitialLoad = useRef(true)
@@ -138,12 +172,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const loadFromFirestore = async () => {
       setIsLoading(true)
       try {
-        let userData = await loadUserData(userId)
+        // Run migration if needed
+        await migrateUserData(userId)
+
+        // Load user profile
+        let profile = await loadUserProfile(userId)
 
         if (cancelled) return
 
-        if (!userData) {
-          // First-time user: check if localStorage has data to migrate
+        if (!profile) {
+          // First-time user
           const hasLocalData =
             localStorage.getItem('sessions') ||
             localStorage.getItem('notes') ||
@@ -158,27 +196,56 @@ export function AppProvider({ children }: { children: ReactNode }) {
               language,
             }
             await saveAllUserData(userId, migrationData)
-            userData = migrationData
+            await migrateUserData(userId)
           } else {
-            userData = await initializeUserData(userId)
+            await initializeUserData(userId)
+          }
+          profile = await loadUserProfile(userId)
+        }
+
+        if (cancelled || !profile) return
+
+        // Update state with profile data
+        setSettingsState(profile.settings as any)
+        setTimerPresetsState(profile.timerPresets)
+        setLanguageState(profile.language)
+        setTotalNotesCount(profile.notesCount ?? 0)
+        setTotalSessionsCount(profile.sessionsCount ?? 0)
+        isMigratedRef.current = profile.migrated ?? false
+
+        if (profile.migrated) {
+          // Load from sub-collections
+          const allSessions = await loadAllSessions(userId)
+          if (!cancelled) {
+            setSessionsState(allSessions)
+            localStorage.setItem('sessions', JSON.stringify(allSessions))
+          }
+
+          const { notes: firstPageNotes, lastDoc, hasMore } =
+            await loadNotesPaginated(userId, 20)
+          if (!cancelled) {
+            setNotesState(firstPageNotes)
+            lastNoteDocRef.current = lastDoc
+            setHasMoreNotes(hasMore)
+            localStorage.setItem('notes', JSON.stringify(firstPageNotes))
+          }
+        } else {
+          // Legacy single-document format
+          const userData = await loadUserData(userId)
+          if (!cancelled && userData) {
+            setSessionsState(userData.sessions)
+            setNotesState(userData.notes)
+            localStorage.setItem('sessions', JSON.stringify(userData.sessions))
+            localStorage.setItem('notes', JSON.stringify(userData.notes))
           }
         }
 
-        if (cancelled) return
-
-        // Firestore is the source of truth
-        setSessionsState(userData.sessions)
-        setNotesState(userData.notes)
-        setTimerPresetsState(userData.timerPresets)
-        setSettingsState(userData.settings)
-        setLanguageState(userData.language)
-
-        // Update localStorage cache
-        localStorage.setItem('sessions', JSON.stringify(userData.sessions))
-        localStorage.setItem('notes', JSON.stringify(userData.notes))
-        localStorage.setItem('timerPresets', JSON.stringify(userData.timerPresets))
-        localStorage.setItem('settings', JSON.stringify(userData.settings))
-        localStorage.setItem('language', userData.language)
+        // Cache profile data
+        if (!cancelled) {
+          localStorage.setItem('settings', JSON.stringify(profile.settings))
+          localStorage.setItem('timerPresets', JSON.stringify(profile.timerPresets))
+          localStorage.setItem('language', profile.language)
+        }
       } catch (error) {
         console.error('Failed to load from Firestore, using localStorage data:', error)
       } finally {
@@ -198,8 +265,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [isHydrated, userId, status])
 
-  // Debounced Firestore sync helper
-  const syncToFirestore = useCallback(
+  // Debounced profile sync
+  const syncProfileToFirestore = useCallback(
     (field: string, value: any) => {
       if (!userId || isInitialLoad.current) return
 
@@ -210,9 +277,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       syncTimers.current[field] = setTimeout(async () => {
         try {
           setIsSyncing(true)
-          await updateUserField(userId, field as any, value)
+          await updateUserProfile(userId, field, value)
         } catch (error) {
-          console.error(`Failed to sync ${field} to Firestore:`, error)
+          console.error(`Failed to sync ${field}:`, error)
         } finally {
           setIsSyncing(false)
         }
@@ -221,63 +288,185 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [userId]
   )
 
-  // Wrapped setters: localStorage + Firestore
+  // Profile setters
   const setLanguage = useCallback(
     (lang: string) => {
       setLanguageState(lang)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('language', lang)
-      }
-      syncToFirestore('language', lang)
+      if (typeof window !== 'undefined') localStorage.setItem('language', lang)
+      syncProfileToFirestore('language', lang)
     },
-    [syncToFirestore]
-  )
-
-  const setSessions = useCallback(
-    (newSessions: any[]) => {
-      setSessionsState(newSessions)
-      if (isHydrated && typeof window !== 'undefined') {
-        localStorage.setItem('sessions', JSON.stringify(newSessions))
-      }
-      syncToFirestore('sessions', newSessions)
-    },
-    [isHydrated, syncToFirestore]
-  )
-
-  const setNotes = useCallback(
-    (newNotes: any[]) => {
-      setNotesState(newNotes)
-      if (isHydrated && typeof window !== 'undefined') {
-        localStorage.setItem('notes', JSON.stringify(newNotes))
-      }
-      syncToFirestore('notes', newNotes)
-    },
-    [isHydrated, syncToFirestore]
+    [syncProfileToFirestore]
   )
 
   const setSettings = useCallback(
     (newSettings: any) => {
       setSettingsState(newSettings)
-      if (isHydrated && typeof window !== 'undefined') {
+      if (isHydrated && typeof window !== 'undefined')
         localStorage.setItem('settings', JSON.stringify(newSettings))
-      }
-      syncToFirestore('settings', newSettings)
+      syncProfileToFirestore('settings', newSettings)
     },
-    [isHydrated, syncToFirestore]
+    [isHydrated, syncProfileToFirestore]
   )
 
   const setTimerPresets = useCallback(
     (newPresets: TimerPreset[]) => {
       setTimerPresetsState(newPresets)
-      if (isHydrated && typeof window !== 'undefined') {
+      if (isHydrated && typeof window !== 'undefined')
         localStorage.setItem('timerPresets', JSON.stringify(newPresets))
-      }
-      syncToFirestore('timerPresets', newPresets)
+      syncProfileToFirestore('timerPresets', newPresets)
     },
-    [isHydrated, syncToFirestore]
+    [isHydrated, syncProfileToFirestore]
   )
 
-  // Apply dark mode class to <html>
+  // Session CRUD
+  const addSession = useCallback(
+    async (sessionData: any) => {
+      if (userId && isMigratedRef.current) {
+        const newId = await addSessionV2(userId, sessionData)
+        const newSession = { ...sessionData, id: newId }
+        setSessionsState((prev) => [...prev, newSession])
+        setTotalSessionsCount((prev) => prev + 1)
+      } else {
+        const newSession = { ...sessionData, id: Date.now() }
+        setSessions([...sessions, newSession])
+      }
+    },
+    [userId, sessions]
+  )
+
+  const updateSessionById = useCallback(
+    async (sessionId: string, data: any) => {
+      if (userId && isMigratedRef.current) {
+        await updateSessionV2(userId, sessionId, data)
+      }
+      setSessionsState((prev) =>
+        prev.map((s) => (s.id === sessionId ? { ...s, ...data } : s))
+      )
+    },
+    [userId]
+  )
+
+  const deleteSessionById = useCallback(
+    async (sessionId: string) => {
+      if (userId && isMigratedRef.current) {
+        await deleteSessionV2(userId, sessionId)
+        setTotalSessionsCount((prev) => Math.max(0, prev - 1))
+      }
+      setSessionsState((prev) => prev.filter((s) => s.id !== sessionId))
+    },
+    [userId]
+  )
+
+  // Legacy setSessions
+  const setSessions = useCallback(
+    (newSessions: any[]) => {
+      setSessionsState(newSessions)
+      if (isHydrated && typeof window !== 'undefined')
+        localStorage.setItem('sessions', JSON.stringify(newSessions))
+      if (!isMigratedRef.current && userId && !isInitialLoad.current) {
+        if (syncTimers.current['sessions']) clearTimeout(syncTimers.current['sessions'])
+        syncTimers.current['sessions'] = setTimeout(async () => {
+          try {
+            const { updateUserField } = await import('@/lib/firestore')
+            await updateUserField(userId, 'sessions', newSessions)
+          } catch {}
+        }, 500)
+      }
+    },
+    [isHydrated, userId]
+  )
+
+  // Note CRUD
+  const addNote = useCallback(
+    async (noteData: any) => {
+      if (userId && isMigratedRef.current) {
+        const newId = await addNoteV2(userId, noteData)
+        const newNote = { ...noteData, id: newId }
+        setNotesState((prev) => [newNote, ...prev])
+        setTotalNotesCount((prev) => prev + 1)
+      } else {
+        const newNote = { ...noteData, id: Date.now() }
+        setNotes([newNote, ...notes])
+      }
+    },
+    [userId, notes]
+  )
+
+  const updateNoteById = useCallback(
+    async (noteId: string, data: any) => {
+      if (userId && isMigratedRef.current) {
+        await updateNoteV2(userId, noteId, data)
+      }
+      setNotesState((prev) =>
+        prev.map((n) => (n.id === noteId ? { ...n, ...data } : n))
+      )
+    },
+    [userId]
+  )
+
+  const deleteNoteById = useCallback(
+    async (noteId: string) => {
+      if (userId && isMigratedRef.current) {
+        await deleteNoteV2(userId, noteId)
+        setTotalNotesCount((prev) => Math.max(0, prev - 1))
+      }
+      setNotesState((prev) => prev.filter((n) => n.id !== noteId))
+    },
+    [userId]
+  )
+
+  // Legacy setNotes
+  const setNotes = useCallback(
+    (newNotes: any[]) => {
+      setNotesState(newNotes)
+      if (isHydrated && typeof window !== 'undefined')
+        localStorage.setItem('notes', JSON.stringify(newNotes))
+      if (!isMigratedRef.current && userId && !isInitialLoad.current) {
+        if (syncTimers.current['notes']) clearTimeout(syncTimers.current['notes'])
+        syncTimers.current['notes'] = setTimeout(async () => {
+          try {
+            const { updateUserField } = await import('@/lib/firestore')
+            await updateUserField(userId, 'notes', newNotes)
+          } catch {}
+        }, 500)
+      }
+    },
+    [isHydrated, userId]
+  )
+
+  // Load more notes
+  const loadMoreNotes = useCallback(async () => {
+    if (!userId || !hasMoreNotes || isLoadingMore) return
+    setIsLoadingMore(true)
+    try {
+      const { notes: moreNotes, lastDoc, hasMore } =
+        await loadNotesPaginated(userId, 20, lastNoteDocRef.current)
+      setNotesState((prev) => [...prev, ...moreNotes])
+      lastNoteDocRef.current = lastDoc
+      setHasMoreNotes(hasMore)
+    } catch (error) {
+      console.error('Failed to load more notes:', error)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [userId, hasMoreNotes, isLoadingMore])
+
+  // Load sessions for date range
+  const loadSessionsForRange = useCallback(
+    async (startDate: string, endDate: string): Promise<any[]> => {
+      if (!userId || !isMigratedRef.current) {
+        return sessions.filter((s) => s.date >= startDate && s.date <= endDate)
+      }
+      try {
+        return await loadSessionsByDateRange(userId, startDate, endDate)
+      } catch {
+        return sessions.filter((s) => s.date >= startDate && s.date <= endDate)
+      }
+    },
+    [userId, sessions]
+  )
+
+  // Dark mode
   useEffect(() => {
     if (typeof window !== 'undefined') {
       if (settings.theme === 'dark') {
@@ -288,7 +477,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [settings.theme])
 
-  // Request notification permission
+  // Notification permission
   const requestNotificationPermission = useCallback(async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) return null
     const permission = await Notification.requestPermission()
@@ -296,7 +485,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return permission
   }, [])
 
-  // Browser study reminders - check every 60s for upcoming sessions
+  // Browser study reminders
   useEffect(() => {
     if (!isHydrated || typeof window === 'undefined') return
     if (!settings.notifications.studyReminders) return
@@ -305,9 +494,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const checkUpcomingSessions = () => {
       const now = new Date()
       const todayStr = getTodayStr()
-      const todaySessions = sessions.filter(s => s.date === todayStr)
+      const todaySessions = sessions.filter((s) => s.date === todayStr)
 
-      todaySessions.forEach(session => {
+      todaySessions.forEach((session) => {
         const [hours, minutes] = session.startTime.split(':').map(Number)
         const sessionTime = new Date()
         sessionTime.setHours(hours, minutes, 0, 0)
@@ -315,7 +504,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const diffMs = sessionTime.getTime() - now.getTime()
         const diffMin = diffMs / (1000 * 60)
 
-        // Notify 5 minutes before (between 4 and 6 minutes to catch within the 60s interval)
         const notifKey = `${session.id}-${session.date}`
         if (diffMin > 0 && diffMin <= 6 && !notifiedSessionsRef.current.has(notifKey)) {
           notifiedSessionsRef.current.add(notifKey)
@@ -338,7 +526,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval)
   }, [isHydrated, sessions, settings.notifications.studyReminders, language])
 
-  // Email daily reminders - send once per day when app loads
+  // Email daily reminders
   useEffect(() => {
     if (!isHydrated || typeof window === 'undefined') return
     if (!settings.notifications.emailReminders) return
@@ -347,13 +535,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const lastEmailDate = localStorage.getItem('lastEmailDate')
     if (lastEmailDate === todayStr) return
 
-    // Get user email from session storage (set by AuthProvider)
     const sendDailyEmail = async () => {
       try {
-        const sessionData = await fetch('/api/auth/session').then(r => r.json())
+        const sessionData = await fetch('/api/auth/session').then((r) => r.json())
         if (!sessionData?.user?.email) return
 
-        const todaySessions = sessions.filter(s => s.date === todayStr)
+        const todaySessions = sessions.filter((s) => s.date === todayStr)
 
         await fetch('/api/notifications/email', {
           method: 'POST',
@@ -368,17 +555,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
         })
 
         localStorage.setItem('lastEmailDate', todayStr)
-      } catch {
-        // Silently fail - don't block app
-      }
+      } catch {}
     }
 
-    // Small delay to not block initial render
     const timeout = setTimeout(sendDailyEmail, 3000)
     return () => clearTimeout(timeout)
   }, [isHydrated, settings.notifications.emailReminders, sessions, language])
 
-  // Weekly report - send once per week when app loads
+  // Weekly report
   useEffect(() => {
     if (!isHydrated || typeof window === 'undefined') return
     if (!settings.notifications.weeklyReport) return
@@ -389,10 +573,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const sendWeeklyReport = async () => {
       try {
-        const sessionData = await fetch('/api/auth/session').then(r => r.json())
+        const sessionData = await fetch('/api/auth/session').then((r) => r.json())
         if (!sessionData?.user?.email) return
 
-        // Calculate last week's stats
         const now = new Date()
         const day = now.getDay()
         const diff = day === 0 ? -6 : 1 - day
@@ -403,7 +586,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const lastSunday = new Date(thisMonday)
         lastSunday.setDate(thisMonday.getDate() - 1)
 
-        const lastWeekSessions = sessions.filter(s => {
+        const lastWeekSessions = sessions.filter((s) => {
           const d = new Date(s.date)
           return d >= lastMonday && d <= lastSunday
         })
@@ -411,7 +594,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const totalHours = lastWeekSessions.reduce((acc, s) => {
           const start = s.startTime.split(':').map(Number)
           const end = s.endTime.split(':').map(Number)
-          return acc + ((end[0] + end[1] / 60) - (start[0] + start[1] / 60))
+          return acc + (end[0] + end[1] / 60 - (start[0] + start[1] / 60))
         }, 0)
 
         await fetch('/api/notifications/email', {
@@ -426,32 +609,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
             weeklyStats: {
               totalSessions: lastWeekSessions.length,
               totalHours: Math.round(totalHours),
-              totalNotes: notes.length,
+              totalNotes: totalNotesCount || notes.length,
             },
           }),
         })
 
         localStorage.setItem('lastWeeklyReportDate', mondayStr)
-      } catch {
-        // Silently fail
-      }
+      } catch {}
     }
 
     const timeout = setTimeout(sendWeeklyReport, 5000)
     return () => clearTimeout(timeout)
-  }, [isHydrated, settings.notifications.weeklyReport, sessions, notes, language])
+  }, [isHydrated, settings.notifications.weeklyReport, sessions, notes, language, totalNotesCount])
 
-  // Translation function
+  // Translation
   const t = (key: string) => {
     const langData = translations[language as keyof typeof translations]
     if (!langData) return key
 
-    // Handle nested paths like 'category.key'
-    if (key.includes('.')) {
-      return getNestedValue(langData, key)
-    }
+    if (key.includes('.')) return getNestedValue(langData, key)
 
-    // Search across all categories for flat keys
     for (const category of Object.values(langData)) {
       if (typeof category === 'object' && key in (category as any)) {
         return (category as any)[key]
@@ -461,7 +638,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return key
   }
 
-  // Cleanup debounce timers on unmount
+  // Cleanup
   useEffect(() => {
     return () => {
       Object.values(syncTimers.current).forEach(clearTimeout)
@@ -484,6 +661,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     notificationPermission,
     isLoading,
     isSyncing,
+    loadMoreNotes,
+    hasMoreNotes,
+    isLoadingMore,
+    loadSessionsForRange,
+    addSession,
+    updateSessionById,
+    deleteSessionById,
+    addNote,
+    updateNoteById,
+    deleteNoteById,
+    totalNotesCount,
+    totalSessionsCount,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

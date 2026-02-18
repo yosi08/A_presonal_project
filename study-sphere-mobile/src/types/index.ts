@@ -43,7 +43,7 @@ export interface UserInfo {
   name: string;
   email: string;
   image?: string;
-  id?: string;
+  id: string;
 }
 
 export const COLOR_MAP: Record<string, string> = {

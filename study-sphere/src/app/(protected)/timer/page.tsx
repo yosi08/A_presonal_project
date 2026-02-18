@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Play, Pause, RotateCcw, Settings, Coffee, BookOpen, Plus, X, Bookmark } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
+import { formatTime, calculateProgress, calculateStrokeDashoffset } from '@/lib/utils/timer'
 
 export default function Timer() {
   const { t, timerPresets, setTimerPresets } = useApp()
@@ -109,18 +110,12 @@ export default function Timer() {
     if (activePresetId === id) setActivePresetId(null)
   }
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
-  }
-
   const progress = isStudyTime
-    ? ((studyMinutes * 60 - timeLeft) / (studyMinutes * 60)) * 100
-    : ((breakMinutes * 60 - timeLeft) / (breakMinutes * 60)) * 100
+    ? calculateProgress(timeLeft, studyMinutes)
+    : calculateProgress(timeLeft, breakMinutes)
 
   const circumference = 2 * Math.PI * 120
-  const strokeDashoffset = circumference - (progress / 100) * circumference
+  const strokeDashoffset = calculateStrokeDashoffset(progress, 120)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
