@@ -1,5 +1,5 @@
 export interface Session {
-  id: number;
+  id: string;
   title: string;
   date: string;
   startTime: string;
@@ -9,7 +9,7 @@ export interface Session {
 }
 
 export interface Note {
-  id: number;
+  id: string;
   title: string;
   subject: string;
   date: string;
@@ -17,7 +17,6 @@ export interface Note {
   cues: string;
   notes: string;
   summary: string;
-  content?: string;
 }
 
 export interface NotificationSettings {

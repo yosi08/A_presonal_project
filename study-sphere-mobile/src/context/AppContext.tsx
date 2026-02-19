@@ -92,7 +92,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (map.settings) setSettingsState(JSON.parse(map.settings));
         if (map.timerPresets) setTimerPresetsState(JSON.parse(map.timerPresets));
       } catch (e) {
-        // silently fail
+        console.error('Failed to load local data from AsyncStorage:', e);
       }
       setIsHydrated(true);
     };

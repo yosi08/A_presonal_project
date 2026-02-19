@@ -10,10 +10,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Edit3, Trash2, Check, X } from 'lucide-react-native';
+import * as Crypto from 'expo-crypto';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '../theme/ThemeContext';
 import { useApp } from '../context/AppContext';
 import { boxShadow } from '../utils/styles';
+import { getTodayStr } from '../utils/date';
 import { SUBJECTS, Note } from '../types';
 
 const getSubjectColor = (subject: string): string => {
@@ -38,7 +40,7 @@ export default function NoteDetailScreen() {
   const [title, setTitle] = useState(existingNote?.title || '');
   const [subject, setSubject] = useState(existingNote?.subject || 'Other');
   const [cues, setCues] = useState(existingNote?.cues || '');
-  const [noteContent, setNoteContent] = useState(existingNote?.notes || existingNote?.content || '');
+  const [noteContent, setNoteContent] = useState(existingNote?.notes || '');
   const [summary, setSummary] = useState(existingNote?.summary || '');
 
   const getSubjectTranslation = (subj: string) => {
@@ -58,14 +60,10 @@ export default function NoteDetailScreen() {
 
     if (isNew) {
       const newNote: Note = {
-        id: Date.now(),
+        id: Crypto.randomUUID(),
         title: title.trim(),
         subject,
-        date: new Date().toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        }),
+        date: getTodayStr(),
         color: getSubjectColor(subject),
         cues,
         notes: noteContent,
@@ -296,7 +294,7 @@ export default function NoteDetailScreen() {
                 </View>
                 <View style={styles.cornellViewContent}>
                   <Text style={[styles.cornellViewText, { color: c.text }]}>
-                    {existingNote.notes || existingNote.content || (
+                    {existingNote.notes || (
                       <Text style={{ color: c.textTertiary, fontStyle: 'italic' }}>{t('noNotes')}</Text>
                     )}
                   </Text>

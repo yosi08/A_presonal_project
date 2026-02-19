@@ -14,26 +14,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Crypto from 'expo-crypto';
 import { Plus, Clock, Edit3, Trash2, X } from 'lucide-react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useApp } from '../context/AppContext';
+import { getTodayStr } from '../utils/date';
 import { SUBJECTS, getSessionColor } from '../types';
-
-const SUBJECT_COLORS: Record<string, string> = {
-  Mathematics: '#6366F1',
-  Physics: '#F43F5E',
-  Chemistry: '#22C55E',
-  Biology: '#A855F7',
-  'Computer Science': '#3B82F6',
-  Other: '#64748B',
-};
+import { HERO_GRADIENT_COLORS } from '../theme/colors';
 
 export default function CalendarScreen() {
   const { c, isDark } = useTheme();
   const { t, language, sessions, setSessions } = useApp();
 
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const todayStr = getTodayStr();
 
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,14 +55,14 @@ export default function CalendarScreen() {
       }
       const color = getSessionColor(s.color);
       if (marks[s.date].dots.length < 3) {
-        marks[s.date].dots.push({ key: String(s.id), color });
+        marks[s.date].dots.push({ key: s.id, color });
       }
     });
     // Mark selected date
     if (marks[selectedDate]) {
-      marks[selectedDate] = { ...marks[selectedDate], selected: true, selectedColor: '#2563EB' };
+      marks[selectedDate] = { ...marks[selectedDate], selected: true, selectedColor: c.primary };
     } else {
-      marks[selectedDate] = { selected: true, selectedColor: '#2563EB', dots: [] };
+      marks[selectedDate] = { selected: true, selectedColor: c.primary, dots: [] };
     }
     // Mark today
     if (todayStr !== selectedDate && !marks[todayStr]) {
@@ -112,10 +105,10 @@ export default function CalendarScreen() {
       setSessions([
         ...sessions,
         {
-          id: Date.now(),
+          id: Crypto.randomUUID(),
           ...newSession,
           date: selectedDate,
-          color: '#2563EB',
+          color: c.primary,
         },
       ]);
     }
@@ -134,7 +127,7 @@ export default function CalendarScreen() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteSession = (sessionId: number) => {
+  const handleDeleteSession = (sessionId: string) => {
     setSessions(sessions.filter((s) => s.id !== sessionId));
   };
 
@@ -170,7 +163,7 @@ export default function CalendarScreen() {
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
       {/* Header */}
-      <LinearGradient colors={['#2563EB', '#1E3A8A']} style={styles.header}>
+      <LinearGradient colors={HERO_GRADIENT_COLORS} style={styles.header}>
         <SafeAreaView edges={['top']}>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>{t('calendar')}</Text>
@@ -190,9 +183,9 @@ export default function CalendarScreen() {
               backgroundColor: c.surface,
               calendarBackground: c.surface,
               textSectionTitleColor: c.textSecondary,
-              selectedDayBackgroundColor: '#2563EB',
+              selectedDayBackgroundColor: c.primary,
               selectedDayTextColor: '#FFFFFF',
-              todayTextColor: '#2563EB',
+              todayTextColor: c.primary,
               dayTextColor: c.text,
               textDisabledColor: c.textTertiary,
               arrowColor: c.primary,
@@ -216,7 +209,7 @@ export default function CalendarScreen() {
             </View>
             <TouchableOpacity
               onPress={openAddModal}
-              style={[styles.addBtn, { backgroundColor: '#2563EB' }]}
+              style={[styles.addBtn, { backgroundColor: c.primary }]}
             >
               <Plus color="#fff" size={20} />
             </TouchableOpacity>
@@ -275,7 +268,7 @@ export default function CalendarScreen() {
       </ScrollView>
 
       {/* FAB */}
-      <TouchableOpacity style={styles.fab} onPress={openAddModal} activeOpacity={0.8}>
+      <TouchableOpacity style={[styles.fab, { backgroundColor: c.primary }]} onPress={openAddModal} activeOpacity={0.8}>
         <Plus color="#fff" size={26} />
       </TouchableOpacity>
 
@@ -382,7 +375,7 @@ export default function CalendarScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleAddSession}
-                style={[styles.modalBtn, { backgroundColor: '#2563EB' }]}
+                style={[styles.modalBtn, { backgroundColor: c.primary }]}
               >
                 <Text style={{ color: '#fff', fontWeight: '600' }}>
                   {editingSession ? t('saveChanges') : t('addSession')}
@@ -439,7 +432,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#2563EB',
     justifyContent: 'center',
     alignItems: 'center',
     ...boxShadow('#2563EB', 0, 4, 0.35, 8, 6),

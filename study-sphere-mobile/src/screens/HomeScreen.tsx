@@ -26,6 +26,8 @@ import { useApp } from '../context/AppContext';
 import { useTheme } from '../theme/ThemeContext';
 import { getSessionColor, Note } from '../types';
 import { boxShadow } from '../utils/styles';
+import { getTodayStr } from '../utils/date';
+import { HERO_GRADIENT_COLORS } from '../theme/colors';
 
 const { width } = Dimensions.get('window');
 
@@ -37,7 +39,7 @@ export default function HomeScreen() {
 
   // Calculate today's date info
   const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const todayStr = getTodayStr();
 
   // Get sessions for today
   const todaySessions = useMemo(
@@ -45,10 +47,10 @@ export default function HomeScreen() {
     [sessions, todayStr]
   );
 
-  // Calculate this week's date range (Sunday to Saturday)
+  // Calculate this week's date range (Monday to Sunday)
   const startOfWeek = useMemo(() => {
     const d = new Date(today);
-    d.setDate(today.getDate() - today.getDay());
+    d.setDate(today.getDate() - (today.getDay() + 6) % 7);
     d.setHours(0, 0, 0, 0);
     return d;
   }, [todayStr]);
@@ -106,8 +108,7 @@ export default function HomeScreen() {
     return Array.from({ length: 7 }, (_, i) => {
       const date = new Date(startOfWeek);
       date.setDate(startOfWeek.getDate() + i);
-      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-      const daySessions = sessions.filter((s) => s.date === dateStr);
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;      const daySessions = sessions.filter((s) => s.date === dateStr);
       const isToday = dateStr === todayStr;
 
       return {
@@ -137,7 +138,7 @@ export default function HomeScreen() {
         {item.subject} {'\u2022'} {item.date}
       </Text>
       <Text style={[styles.noteContent, { color: c.textTertiary }]} numberOfLines={2}>
-        {item.content || item.summary || item.notes || ''}
+        {item.notes || item.summary || ''}
       </Text>
     </TouchableOpacity>
   );
@@ -152,7 +153,7 @@ export default function HomeScreen() {
       >
         {/* Hero Section */}
         <LinearGradient
-          colors={['#2563EB', '#1E3A8A']}
+          colors={HERO_GRADIENT_COLORS}
           style={styles.heroGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -384,7 +385,7 @@ export default function HomeScreen() {
               <FlatList
                 data={recentNotes}
                 renderItem={renderNoteCard}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item) => item.id}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.notesListContent}

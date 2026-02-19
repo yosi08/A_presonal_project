@@ -58,3 +58,6 @@ export const colors = {
 };
 
 export type ThemeColors = typeof colors.light;
+
+// 앱 전반에서 공유하는 헤더 그라디언트 색상
+export const HERO_GRADIENT_COLORS: [string, string] = ['#2563EB', '#1E3A8A'];

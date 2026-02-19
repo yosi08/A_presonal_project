@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { UserInfo } from '../types';
@@ -27,9 +28,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    webClientId: 'YOUR_WEB_CLIENT_ID',
-    iosClientId: 'YOUR_IOS_CLIENT_ID',
-    androidClientId: 'YOUR_ANDROID_CLIENT_ID',
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
   });
 
   // Load saved user on mount
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(JSON.parse(savedUser));
         }
       } catch (e) {
-        // silently fail
+        console.error('Failed to load saved user:', e);
       }
       setIsLoading(false);
     };
@@ -72,9 +73,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       setUser(userData);
       await AsyncStorage.setItem('userInfo', JSON.stringify(userData));
-      await AsyncStorage.setItem('authToken', accessToken);
+      // authToken은 민감한 정보이므로 SecureStore에 암호화 저장
+      await SecureStore.setItemAsync('authToken', accessToken);
     } catch (e) {
-      // silently fail
+      console.error('Failed to fetch user info:', e);
     }
   };
 
@@ -84,7 +86,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     setUser(null);
-    await AsyncStorage.multiRemove(['userInfo', 'authToken']);
+    await AsyncStorage.removeItem('userInfo');
+    await SecureStore.deleteItemAsync('authToken');
   };
 
   return (

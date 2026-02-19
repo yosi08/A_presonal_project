@@ -20,6 +20,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useApp } from '../context/AppContext';
 import { SUBJECTS, Note } from '../types';
 import { RootStackParamList } from '../navigation/types';
+import { HERO_GRADIENT_COLORS } from '../theme/colors';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -66,7 +67,7 @@ export default function NotesScreen() {
   }, [notes, searchTerm, selectedSubject]);
 
   const handleDeleteNote = useCallback(
-    (noteId: number, noteTitle: string) => {
+    (noteId: string, noteTitle: string) => {
       Alert.alert(
         t('calendar.delete'),
         `"${noteTitle}"`,
@@ -245,7 +246,7 @@ export default function NotesScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: c.background }]} edges={['top']}>
       {/* Hero header */}
       <LinearGradient
-        colors={['#2563EB', '#1E3A8A']}
+        colors={HERO_GRADIENT_COLORS}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.hero}
@@ -329,7 +330,7 @@ export default function NotesScreen() {
       {/* Notes list */}
       <FlatList
         data={filteredNotes}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.id}
         renderItem={renderNoteCard}
         ListEmptyComponent={renderEmpty}
         contentContainerStyle={[

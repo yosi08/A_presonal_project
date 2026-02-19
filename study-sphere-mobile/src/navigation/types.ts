@@ -1,7 +1,7 @@
 export type RootStackParamList = {
   Login: undefined;
   Main: undefined;
-  NoteDetail: { noteId?: number; isNew?: boolean };
+  NoteDetail: { noteId?: string; isNew?: boolean };
 };
 
 export type MainTabParamList = {

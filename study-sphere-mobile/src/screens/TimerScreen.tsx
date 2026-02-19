@@ -29,6 +29,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useTheme } from '../theme/ThemeContext';
 import { boxShadow } from '../utils/styles';
 import { useApp } from '../context/AppContext';
+import { HERO_GRADIENT_COLORS } from '../theme/colors';
 
 export default function TimerScreen() {
   const { c, isDark } = useTheme();
@@ -191,7 +192,7 @@ export default function TimerScreen() {
   return (
     <View style={[styles.container, { backgroundColor: c.background }]}>
       {/* Header */}
-      <LinearGradient colors={['#2563EB', '#1E3A8A']} style={styles.header}>
+      <LinearGradient colors={HERO_GRADIENT_COLORS} style={styles.header}>
         <SafeAreaView edges={['top']}>
           <View style={styles.headerContent}>
             <View>
