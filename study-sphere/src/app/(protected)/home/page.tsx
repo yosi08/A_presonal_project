@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Calendar, Clock, BookOpen, TrendingUp, Plus, ArrowRight } from 'lucide-react'
@@ -11,59 +12,67 @@ export default function Home() {
 
   const user = session?.user || { name: 'User' }
 
-  // Calculate today's date info
-  const today = new Date()
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  // Memoize all session-related calculations in a single pass
+  const { todaySessions, totalHours, weekDays } = useMemo(() => {
+    const today = new Date()
+    const todayStr = today.toISOString().split('T')[0]
 
-  // Get sessions for today
-  const todaySessions = sessions.filter(s => s.date === todayStr)
+    const startOfWeek = new Date(today)
+    startOfWeek.setDate(today.getDate() - today.getDay())
 
-  // Calculate this week's total hours
-  const startOfWeek = new Date(today)
-  startOfWeek.setDate(today.getDate() - today.getDay())
-  const endOfWeek = new Date(startOfWeek)
-  endOfWeek.setDate(startOfWeek.getDate() + 6)
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+    const shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-  const weekSessions = sessions.filter(s => {
-    const sessionDate = new Date(s.date)
-    return sessionDate >= startOfWeek && sessionDate <= endOfWeek
-  })
+    // Pre-generate week date strings for lookup
+    const weekDateStrings: string[] = []
+    const weekDaysData = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(startOfWeek)
+      date.setDate(startOfWeek.getDate() + i)
+      const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+      weekDateStrings.push(dateStr)
+      return {
+        day: shortDays[date.getDay()],
+        date: date.getDate(),
+        labelKey: dateStr === todayStr ? 'today' : dayNames[date.getDay()],
+        isToday: dateStr === todayStr,
+        sessions: 0,
+        dateStr,
+      }
+    })
 
-  const totalHours = weekSessions.reduce((acc, s) => {
-    const start = s.startTime.split(':').map(Number)
-    const end = s.endTime.split(':').map(Number)
-    const hours = (end[0] + end[1]/60) - (start[0] + start[1]/60)
-    return acc + hours
-  }, 0)
+    // Single pass through sessions
+    const todaySessionsList: typeof sessions = []
+    let hours = 0
 
-  const stats = [
+    for (const s of sessions) {
+      const weekIndex = weekDateStrings.indexOf(s.date)
+      if (weekIndex !== -1) {
+        weekDaysData[weekIndex].sessions++
+        const start = s.startTime.split(':').map(Number)
+        const end = s.endTime.split(':').map(Number)
+        hours += (end[0] + end[1]/60) - (start[0] + start[1]/60)
+      }
+      if (s.date === todayStr) {
+        todaySessionsList.push(s)
+      }
+    }
+
+    return {
+      todaySessions: todaySessionsList,
+      totalHours: hours,
+      weekDays: weekDaysData,
+    }
+  }, [sessions])
+
+  const stats = useMemo(() => [
     { icon: Calendar, labelKey: 'today', value: todaySessions.length.toString() },
     { icon: Clock, labelKey: 'thisWeek', value: `${Math.round(totalHours)}h` },
     { icon: BookOpen, labelKey: 'notes', value: (totalNotesCount || notes.length).toString() },
     { icon: TrendingUp, labelKey: 'sessions', value: (totalSessionsCount || sessions.length).toString() },
-  ]
-
-  // Generate week days dynamically
-  const weekDays = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date(startOfWeek)
-    date.setDate(startOfWeek.getDate() + i)
-    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-    const daySessions = sessions.filter(s => s.date === dateStr)
-    const isToday = dateStr === todayStr
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
-    const shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-    return {
-      day: shortDays[date.getDay()],
-      date: date.getDate(),
-      labelKey: isToday ? 'today' : dayNames[date.getDay()],
-      isToday,
-      sessions: daySessions.length,
-    }
-  })
+  ], [todaySessions.length, totalHours, totalNotesCount, notes.length, totalSessionsCount, sessions.length])
 
   // Get recent notes (last 3)
-  const recentNotes = notes.slice(0, 3)
+  const recentNotes = useMemo(() => notes.slice(0, 3), [notes])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900">
