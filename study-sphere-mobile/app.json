@@ -30,7 +30,8 @@
         {
           "color": "#2563EB"
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }
