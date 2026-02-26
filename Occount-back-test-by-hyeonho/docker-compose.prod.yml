@@ -1,0 +1,63 @@
+# 프로덕션 배포용 docker-compose
+# 사용법: docker compose -f docker-compose.prod.yml up -d
+
+services:
+  # =============================================
+  # PostgreSQL 데이터베이스
+  # =============================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: occount_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - occount_pg_data:/var/lib/postgresql/data
+    networks:
+      - occount_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # DB 포트는 외부에 노출하지 않음 (보안)
+
+    # =============================================
+    # Occount API 서버
+    # =============================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: occount-backend:latest
+    container_name: occount_app
+    restart: always
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+    depends_on:
+      postgres:
+        condition: service_healthy # DB healthy 확인 후 앱 시작
+    networks:
+      - occount_network
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8080/health || exit 1" ]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+networks:
+  occount_network:
+    driver: bridge
+
+volumes:
+  occount_pg_data:
