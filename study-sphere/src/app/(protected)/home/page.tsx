@@ -57,10 +57,16 @@ export default function Home() {
       }
     }
 
+    // Rotate so today comes first
+    const todayIndex = weekDaysData.findIndex(d => d.isToday)
+    const rotatedWeekDays = todayIndex > 0
+      ? [...weekDaysData.slice(todayIndex), ...weekDaysData.slice(0, todayIndex)]
+      : weekDaysData
+
     return {
       todaySessions: todaySessionsList,
       totalHours: hours,
-      weekDays: weekDaysData,
+      weekDays: rotatedWeekDays,
     }
   }, [sessions])
 
