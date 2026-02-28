@@ -270,3 +270,5 @@ export default function Home() {
     </div>
   )
 }
+
+// 아이디어 고갈 비상비상비상비상비상비상비상 삐뽀삐뽀삐뽀삐뽀삐뽀
