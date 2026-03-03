@@ -10,7 +10,14 @@
       "Bash(git push)",
       "Bash(tree:*)",
       "Bash(git mv:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(git rm --cached study-sphere/.env)",
+      "Bash(git rm --cached Occount-back-test-by-hyeonho)",
+      "Bash(git rm --cached -f Occount-back-test-by-hyeonho)",
+      "Bash(git push origin main)",
+      "mcp__ide__getDiagnostics",
+      "Bash(cd /Users/bumi/A_presonal_project/study-sphere && npm install 2>&1)",
+      "Bash(cd /Users/bumi/A_presonal_project/study-sphere && npm install --prefer-offline 2>&1 | tail -20)"
     ]
   }
 }
