@@ -17,7 +17,10 @@
       "Bash(git push origin main)",
       "mcp__ide__getDiagnostics",
       "Bash(cd /Users/bumi/A_presonal_project/study-sphere && npm install 2>&1)",
-      "Bash(cd /Users/bumi/A_presonal_project/study-sphere && npm install --prefer-offline 2>&1 | tail -20)"
+      "Bash(cd /Users/bumi/A_presonal_project/study-sphere && npm install --prefer-offline 2>&1 | tail -20)",
+      "Bash(git fetch origin)",
+      "Bash(git pull origin main)",
+      "Bash(git pull --no-rebase origin main)"
     ]
   }
 }

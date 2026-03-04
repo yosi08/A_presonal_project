@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useSession, signOut } from 'next-auth/react'
-import { User, Bell, Palette, Shield, Save, Check, Globe, Camera } from 'lucide-react'
+import { User, Bell, Palette, Shield, Save, Check, Globe } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import { deleteUserData } from '@/lib/firestore'
 
